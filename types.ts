@@ -1,7 +1,8 @@
 export enum UserRole {
   ADMIN = 'ADMIN',
   STAFF = 'STAFF',
-  STUDENT = 'STUDENT'
+  STUDENT = 'STUDENT',
+  VICTIM = 'VICTIM'
 }
 
 export enum ComplaintStatus {

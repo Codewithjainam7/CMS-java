@@ -30,8 +30,8 @@ const Layout: React.FC<LayoutProps> = ({
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: [UserRole.ADMIN, UserRole.STAFF] },
     { id: 'complaints', label: 'All Complaints', icon: List, roles: [UserRole.ADMIN, UserRole.STAFF] },
-    { id: 'my-complaints', label: 'My Complaints', icon: List, roles: [UserRole.CUSTOMER] },
-    { id: 'create-complaint', label: 'New Complaint', icon: FileText, roles: [UserRole.CUSTOMER] },
+    { id: 'my-complaints', label: 'My Complaints', icon: List, roles: [UserRole.STUDENT, UserRole.VICTIM] },
+    { id: 'create-complaint', label: 'New Complaint', icon: FileText, roles: [UserRole.STUDENT, UserRole.VICTIM] },
     { id: 'reports', label: 'Analytics & Reports', icon: FileText, roles: [UserRole.ADMIN] },
     { id: 'java-source', label: 'Backend Source', icon: Code, roles: [UserRole.ADMIN, UserRole.STAFF] },
   ];
