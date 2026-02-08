@@ -9,32 +9,57 @@ import {
 } from '../utils/javaCodeSnippets';
 
 interface TerminalLine {
-  type: 'input' | 'output' | 'error' | 'success' | 'info' | 'code';
+  type: 'input' | 'output' | 'error' | 'success' | 'info' | 'code' | 'ascii' | 'highlight';
   content: string;
-  timestamp?: Date;
 }
 
-const CODE_MAP: Record<string, { name: string; code: string; description: string }> = {
-  'complaint': { name: 'Complaint.java', code: JAVA_COMPLAINT_ENTITY, description: 'JPA Entity for complaints with validation and enums' },
-  'user': { name: 'User.java', code: JAVA_USER_ENTITY, description: 'User entity with Spring Security integration' },
-  'complaintrepo': { name: 'ComplaintRepository.java', code: JAVA_COMPLAINT_REPOSITORY, description: 'Spring Data JPA repository with custom queries' },
-  'sentiment': { name: 'SentimentAnalysisService.java', code: JAVA_SENTIMENT_LOGIC, description: 'AI-powered sentiment analysis service' },
-  'sla': { name: 'SLAService.java', code: JAVA_SLA_SCHEDULER, description: 'SLA monitoring with scheduled breach checking' },
-  'gamification': { name: 'GamificationService.java', code: JAVA_GAMIFICATION, description: 'Points, badges, and leaderboard system' },
-  'qrcode': { name: 'QRCodeService.java', code: JAVA_QR_GENERATION, description: 'QR code generation using ZXing' },
-  'complaintcontroller': { name: 'ComplaintController.java', code: JAVA_CONTROLLER, description: 'REST API endpoints for complaints' },
-  'authcontroller': { name: 'AuthController.java', code: JAVA_AUTH_CONTROLLER, description: 'JWT authentication endpoints' },
-  'security': { name: 'SecurityConfig.java', code: JAVA_SECURITY, description: 'Spring Security configuration' },
-  'jwt': { name: 'JwtTokenProvider.java', code: JAVA_JWT_PROVIDER, description: 'JWT token generation and validation' },
-  'app': { name: 'CmsApplication.java', code: JAVA_APPLICATION, description: 'Main Spring Boot entry point' },
+// All files with multiple keyword aliases
+const CODE_MAP: Record<string, { name: string; code: string; description: string; path: string }> = {
+  // Models
+  'complaint.java': { name: 'Complaint.java', code: JAVA_COMPLAINT_ENTITY, description: 'JPA Entity for complaints', path: 'model/' },
+  'complaint': { name: 'Complaint.java', code: JAVA_COMPLAINT_ENTITY, description: 'JPA Entity for complaints', path: 'model/' },
+  'user.java': { name: 'User.java', code: JAVA_USER_ENTITY, description: 'User entity with Spring Security', path: 'model/' },
+  'user': { name: 'User.java', code: JAVA_USER_ENTITY, description: 'User entity with Spring Security', path: 'model/' },
+
+  // Repositories
+  'complaintrepository.java': { name: 'ComplaintRepository.java', code: JAVA_COMPLAINT_REPOSITORY, description: 'Spring Data JPA repository', path: 'repository/' },
+  'complaintrepo': { name: 'ComplaintRepository.java', code: JAVA_COMPLAINT_REPOSITORY, description: 'Spring Data JPA repository', path: 'repository/' },
+
+  // Services
+  'sentimentanalysisservice.java': { name: 'SentimentAnalysisService.java', code: JAVA_SENTIMENT_LOGIC, description: 'AI sentiment analysis', path: 'service/' },
+  'sentiment': { name: 'SentimentAnalysisService.java', code: JAVA_SENTIMENT_LOGIC, description: 'AI sentiment analysis', path: 'service/' },
+  'slaservice.java': { name: 'SLAService.java', code: JAVA_SLA_SCHEDULER, description: 'SLA monitoring service', path: 'service/' },
+  'sla': { name: 'SLAService.java', code: JAVA_SLA_SCHEDULER, description: 'SLA monitoring service', path: 'service/' },
+  'gamificationservice.java': { name: 'GamificationService.java', code: JAVA_GAMIFICATION, description: 'Staff gamification system', path: 'service/' },
+  'gamification': { name: 'GamificationService.java', code: JAVA_GAMIFICATION, description: 'Staff gamification system', path: 'service/' },
+  'qrcodeservice.java': { name: 'QRCodeService.java', code: JAVA_QR_GENERATION, description: 'QR code generation', path: 'service/' },
+  'qrcode': { name: 'QRCodeService.java', code: JAVA_QR_GENERATION, description: 'QR code generation', path: 'service/' },
+  'qr': { name: 'QRCodeService.java', code: JAVA_QR_GENERATION, description: 'QR code generation', path: 'service/' },
+
+  // Controllers
+  'complaintcontroller.java': { name: 'ComplaintController.java', code: JAVA_CONTROLLER, description: 'REST API endpoints', path: 'controller/' },
+  'complaintcontroller': { name: 'ComplaintController.java', code: JAVA_CONTROLLER, description: 'REST API endpoints', path: 'controller/' },
+  'authcontroller.java': { name: 'AuthController.java', code: JAVA_AUTH_CONTROLLER, description: 'JWT auth endpoints', path: 'controller/' },
+  'authcontroller': { name: 'AuthController.java', code: JAVA_AUTH_CONTROLLER, description: 'JWT auth endpoints', path: 'controller/' },
+  'auth': { name: 'AuthController.java', code: JAVA_AUTH_CONTROLLER, description: 'JWT auth endpoints', path: 'controller/' },
+
+  // Security
+  'securityconfig.java': { name: 'SecurityConfig.java', code: JAVA_SECURITY, description: 'Spring Security config', path: 'security/' },
+  'security': { name: 'SecurityConfig.java', code: JAVA_SECURITY, description: 'Spring Security config', path: 'security/' },
+  'jwttokenprovider.java': { name: 'JwtTokenProvider.java', code: JAVA_JWT_PROVIDER, description: 'JWT token handling', path: 'security/' },
+  'jwt': { name: 'JwtTokenProvider.java', code: JAVA_JWT_PROVIDER, description: 'JWT token handling', path: 'security/' },
+  'cmsapplication.java': { name: 'CmsApplication.java', code: JAVA_APPLICATION, description: 'Main entry point', path: '' },
+  'app': { name: 'CmsApplication.java', code: JAVA_APPLICATION, description: 'Main entry point', path: '' },
+  'main': { name: 'CmsApplication.java', code: JAVA_APPLICATION, description: 'Main entry point', path: '' },
 };
 
-const CATEGORIES: Record<string, string[]> = {
-  'models': ['complaint', 'user'],
-  'repositories': ['complaintrepo'],
-  'services': ['sentiment', 'sla', 'gamification', 'qrcode'],
-  'controllers': ['complaintcontroller', 'authcontroller'],
-  'security': ['security', 'jwt', 'app'],
+const DIRECTORY_STRUCTURE: Record<string, string[]> = {
+  '': ['model/', 'repository/', 'service/', 'controller/', 'security/', 'CmsApplication.java'],
+  'model': ['Complaint.java', 'User.java', 'Comment.java'],
+  'repository': ['ComplaintRepository.java', 'UserRepository.java'],
+  'service': ['ComplaintService.java', 'SentimentAnalysisService.java', 'SLAService.java', 'GamificationService.java', 'QRCodeService.java', 'NotificationService.java'],
+  'controller': ['ComplaintController.java', 'AuthController.java'],
+  'security': ['SecurityConfig.java', 'JwtTokenProvider.java', 'JwtAuthenticationFilter.java'],
 };
 
 const JavaSourceViewer: React.FC = () => {
@@ -43,14 +68,15 @@ const JavaSourceViewer: React.FC = () => {
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isTyping, setIsTyping] = useState(false);
+  const [currentDir, setCurrentDir] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
 
   const addLine = (type: TerminalLine['type'], content: string) => {
-    setLines(prev => [...prev, { type, content, timestamp: new Date() }]);
+    setLines(prev => [...prev, { type, content }]);
   };
 
-  const addLines = async (newLines: { type: TerminalLine['type']; content: string }[], delay = 30) => {
+  const addLines = async (newLines: { type: TerminalLine['type']; content: string }[], delay = 15) => {
     setIsTyping(true);
     for (const line of newLines) {
       await new Promise(resolve => setTimeout(resolve, delay));
@@ -59,184 +85,354 @@ const JavaSourceViewer: React.FC = () => {
     setIsTyping(false);
   };
 
-  // Welcome message on mount
+  // Boot sequence on mount
   useEffect(() => {
-    const welcomeLines = [
-      { type: 'info' as const, content: '╔══════════════════════════════════════════════════════════════════════════════╗' },
-      { type: 'info' as const, content: '║                                                                              ║' },
-      { type: 'success' as const, content: '║   🚀 Enterprise CMS - Backend Architecture Terminal                         ║' },
-      { type: 'info' as const, content: '║                                                                              ║' },
-      { type: 'info' as const, content: '║   Spring Boot 3 • Java 17+ • JWT Authentication • JPA/Hibernate             ║' },
-      { type: 'info' as const, content: '║                                                                              ║' },
-      { type: 'info' as const, content: '╚══════════════════════════════════════════════════════════════════════════════╝' },
-      { type: 'output' as const, content: '' },
-      { type: 'output' as const, content: 'Welcome to the CMS Backend Architecture Explorer!' },
-      { type: 'output' as const, content: 'Type "help" to see available commands.' },
-      { type: 'output' as const, content: '' },
-    ];
-    addLines(welcomeLines, 40);
+    const bootSequence = async () => {
+      setIsTyping(true);
+
+      const bootLines = [
+        { type: 'info' as const, content: '[    0.000000] Booting CMS Backend Terminal...' },
+        { type: 'info' as const, content: '[    0.001234] Loading Spring Boot 3.x kernel...' },
+        { type: 'info' as const, content: '[    0.002456] Initializing JPA/Hibernate subsystem...' },
+        { type: 'info' as const, content: '[    0.003789] JWT Security module loaded.' },
+        { type: 'success' as const, content: '[    0.005000] System ready.' },
+        { type: 'output' as const, content: '' },
+      ];
+
+      for (const line of bootLines) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        addLine(line.type, line.content);
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      const asciiArt = [
+        { type: 'ascii' as const, content: '   ______ __  __  _____   ____             _                  _ ' },
+        { type: 'ascii' as const, content: '  / ____||  \\/  |/ ____| |  _ \\           | |                | |' },
+        { type: 'ascii' as const, content: ' | |     | \\  / | (___   | |_) | __ _  ___| | _____ _ __   __| |' },
+        { type: 'ascii' as const, content: ' | |     | |\\/| |\\___ \\  |  _ < / _` |/ __| |/ / _ \\ \'_ \\ / _` |' },
+        { type: 'ascii' as const, content: ' | |____ | |  | |____) | | |_) | (_| | (__|   <  __/ | | | (_| |' },
+        { type: 'ascii' as const, content: '  \\_____||_|  |_|_____/  |____/ \\__,_|\\___|_|\\_\\___|_| |_|\\__,_|' },
+        { type: 'output' as const, content: '' },
+        { type: 'highlight' as const, content: '  ⚡ Enterprise Complaint Management System - Source Explorer v2.0' },
+        { type: 'output' as const, content: '' },
+      ];
+
+      for (const line of asciiArt) {
+        await new Promise(resolve => setTimeout(resolve, 30));
+        addLine(line.type, line.content);
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      addLine('success', '  Type "help" to see available commands, or "ls" to list files.');
+      addLine('output', '');
+
+      setIsTyping(false);
+    };
+
+    bootSequence();
   }, []);
 
-  // Scroll to bottom when new lines added
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
   }, [lines]);
 
-  const processCommand = async (cmd: string) => {
-    const trimmedCmd = cmd.trim().toLowerCase();
-    const parts = trimmedCmd.split(' ');
-    const command = parts[0];
-    const arg = parts[1];
+  const getPrompt = () => {
+    const dir = currentDir ? `/${currentDir}` : '';
+    return `cms:~/java${dir}$`;
+  };
 
-    addLine('input', `$ ${cmd}`);
+  const processCommand = async (cmd: string) => {
+    const trimmedCmd = cmd.trim();
+    const parts = trimmedCmd.split(/\s+/);
+    const command = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    addLine('input', `${getPrompt()} ${cmd}`);
 
     if (!command) return;
 
     switch (command) {
       case 'help':
+      case 'man':
+      case '?':
         await addLines([
-          { type: 'info', content: '' },
-          { type: 'success', content: '📚 Available Commands:' },
-          { type: 'info', content: '─────────────────────────────────────────' },
-          { type: 'output', content: '  help                  Show this help message' },
-          { type: 'output', content: '  list                  List all code categories' },
-          { type: 'output', content: '  cat <category>        Show files in a category' },
-          { type: 'output', content: '  show <file>           Display source code for a file' },
-          { type: 'output', content: '  tree                  Show full project structure' },
-          { type: 'output', content: '  clear                 Clear the terminal' },
-          { type: 'output', content: '  about                 About this project' },
-          { type: 'info', content: '' },
-          { type: 'info', content: '💡 Examples:' },
-          { type: 'output', content: '  $ list' },
-          { type: 'output', content: '  $ cat services' },
-          { type: 'output', content: '  $ show sentiment' },
-          { type: 'info', content: '' },
+          { type: 'output', content: '' },
+          { type: 'highlight', content: '╭──────────────────────────────────────────────────────────────────╮' },
+          { type: 'highlight', content: '│                    📖 COMMAND REFERENCE                         │' },
+          { type: 'highlight', content: '╰──────────────────────────────────────────────────────────────────╯' },
+          { type: 'output', content: '' },
+          { type: 'success', content: '  Navigation:' },
+          { type: 'output', content: '    ls [dir]              List files in current/specified directory' },
+          { type: 'output', content: '    cd <dir>              Change directory (cd model, cd ..)' },
+          { type: 'output', content: '    pwd                   Print current directory' },
+          { type: 'output', content: '    tree                  Show full directory tree' },
+          { type: 'output', content: '' },
+          { type: 'success', content: '  File Viewing:' },
+          { type: 'output', content: '    cat <file>            Display file contents' },
+          { type: 'output', content: '    less <file>           Same as cat (alias)' },
+          { type: 'output', content: '    head <file>           Show first 20 lines' },
+          { type: 'output', content: '' },
+          { type: 'success', content: '  Search:' },
+          { type: 'output', content: '    find <keyword>        Search for files by name' },
+          { type: 'output', content: '    grep <text>           Search in file descriptions' },
+          { type: 'output', content: '' },
+          { type: 'success', content: '  System:' },
+          { type: 'output', content: '    clear                 Clear terminal' },
+          { type: 'output', content: '    about                 About this project' },
+          { type: 'output', content: '    neofetch              System info' },
+          { type: 'output', content: '' },
+          { type: 'info', content: '  💡 Tip: Use Tab for autocomplete, ↑↓ for history' },
+          { type: 'output', content: '' },
+        ], 10);
+        break;
+
+      case 'ls':
+      case 'dir':
+        const lsDir = args[0]?.replace(/\/$/, '') || currentDir;
+        const lsContents = DIRECTORY_STRUCTURE[lsDir];
+        if (!lsContents && lsDir !== '') {
+          addLine('error', `ls: cannot access '${lsDir}': No such directory`);
+          return;
+        }
+        const contents = lsContents || DIRECTORY_STRUCTURE[''];
+        await addLines([
+          { type: 'output', content: '' },
+          ...contents.map(item => ({
+            type: (item.endsWith('/') ? 'success' : 'output') as const,
+            content: `  ${item.endsWith('/') ? '📁' : '📄'} ${item}`
+          })),
+          { type: 'output', content: '' },
+          { type: 'info', content: `  ${contents.length} items` },
+          { type: 'output', content: '' },
         ], 20);
         break;
 
-      case 'list':
-        await addLines([
-          { type: 'info', content: '' },
-          { type: 'success', content: '📂 Backend Code Categories:' },
-          { type: 'info', content: '─────────────────────────────────────────' },
-          { type: 'output', content: '  📁 models        Entity/Model classes (JPA)' },
-          { type: 'output', content: '  📁 repositories  Spring Data JPA repositories' },
-          { type: 'output', content: '  📁 services      Business logic services' },
-          { type: 'output', content: '  📁 controllers   REST API controllers' },
-          { type: 'output', content: '  📁 security      Security & JWT configuration' },
-          { type: 'info', content: '' },
-          { type: 'info', content: '💡 Type "cat <category>" to explore files' },
-          { type: 'info', content: '' },
-        ], 25);
+      case 'cd':
+        const target = args[0]?.replace(/\/$/, '');
+        if (!target || target === '~' || target === '/') {
+          setCurrentDir('');
+        } else if (target === '..') {
+          setCurrentDir('');
+        } else if (DIRECTORY_STRUCTURE[target]) {
+          setCurrentDir(target);
+        } else if (DIRECTORY_STRUCTURE[currentDir]?.some(f => f.replace('/', '') === target)) {
+          setCurrentDir(target);
+        } else {
+          addLine('error', `cd: ${target}: No such directory`);
+          return;
+        }
+        break;
+
+      case 'pwd':
+        addLine('output', `/java${currentDir ? '/' + currentDir : ''}`);
         break;
 
       case 'cat':
-        if (!arg) {
-          addLine('error', '❌ Error: Please specify a category. Usage: cat <category>');
-          addLine('output', '   Try: cat models, cat services, cat controllers');
+      case 'less':
+      case 'more':
+      case 'view':
+      case 'open':
+        const fileName = args[0]?.toLowerCase();
+        if (!fileName) {
+          addLine('error', `${command}: missing file operand`);
           return;
         }
-        if (!CATEGORIES[arg]) {
-          addLine('error', `❌ Error: Unknown category "${arg}"`);
-          addLine('output', '   Available: models, repositories, services, controllers, security');
+        const file = CODE_MAP[fileName];
+        if (!file) {
+          addLine('error', `${command}: ${args[0]}: No such file`);
+          addLine('info', '  💡 Try "ls" to see available files, or "find <keyword>" to search');
           return;
         }
-        const files = CATEGORIES[arg];
         await addLines([
-          { type: 'info', content: '' },
-          { type: 'success', content: `📂 ${arg.toUpperCase()}/` },
-          { type: 'info', content: '─────────────────────────────────────────' },
-          ...files.map(f => ({
-            type: 'output' as const,
-            content: `  📄 ${CODE_MAP[f].name.padEnd(35)} ${CODE_MAP[f].description}`
-          })),
-          { type: 'info', content: '' },
-          { type: 'info', content: `💡 Type "show <name>" to view code (e.g., show ${files[0]})` },
-          { type: 'info', content: '' },
-        ], 25);
+          { type: 'output', content: '' },
+          { type: 'highlight', content: `╭${'─'.repeat(76)}╮` },
+          { type: 'highlight', content: `│ 📄 ${file.name.padEnd(60)} ${file.path.padStart(10)} │` },
+          { type: 'highlight', content: `│ ${file.description.padEnd(72)} │` },
+          { type: 'highlight', content: `╰${'─'.repeat(76)}╯` },
+        ], 20);
+        addLine('code', file.code);
+        addLine('output', '');
+        addLine('info', `  ✓ End of ${file.name}`);
+        addLine('output', '');
         break;
 
-      case 'show':
-        if (!arg) {
-          addLine('error', '❌ Error: Please specify a file. Usage: show <filename>');
-          addLine('output', '   Try: show sentiment, show sla, show security');
+      case 'head':
+        const headFile = args[0]?.toLowerCase();
+        if (!headFile) {
+          addLine('error', 'head: missing file operand');
           return;
         }
-        if (!CODE_MAP[arg]) {
-          addLine('error', `❌ Error: Unknown file "${arg}"`);
-          addLine('output', '   Type "tree" to see all available files');
+        const hFile = CODE_MAP[headFile];
+        if (!hFile) {
+          addLine('error', `head: ${args[0]}: No such file`);
           return;
         }
-        const file = CODE_MAP[arg];
-        await addLines([
-          { type: 'info', content: '' },
-          { type: 'success', content: `📄 ${file.name}` },
-          { type: 'output', content: `   ${file.description}` },
-          { type: 'info', content: '═'.repeat(80) },
-        ], 30);
-        addLine('code', file.code);
-        await addLines([
-          { type: 'info', content: '═'.repeat(80) },
-          { type: 'info', content: '' },
-        ], 30);
+        const headLines = hFile.code.split('\n').slice(0, 20).join('\n');
+        addLine('output', '');
+        addLine('info', `==> ${hFile.name} (first 20 lines) <==`);
+        addLine('code', headLines);
+        addLine('info', '  ... (use "cat" to see full file)');
+        addLine('output', '');
         break;
 
       case 'tree':
         await addLines([
-          { type: 'info', content: '' },
-          { type: 'success', content: '🌳 Project Structure:' },
-          { type: 'info', content: '' },
-          { type: 'output', content: 'java/' },
-          { type: 'output', content: '├── model/' },
-          { type: 'output', content: '│   ├── Complaint.java      [show complaint]' },
-          { type: 'output', content: '│   └── User.java           [show user]' },
-          { type: 'output', content: '├── repository/' },
-          { type: 'output', content: '│   └── ComplaintRepository.java  [show complaintrepo]' },
-          { type: 'output', content: '├── service/' },
-          { type: 'output', content: '│   ├── SentimentAnalysisService.java  [show sentiment]' },
-          { type: 'output', content: '│   ├── SLAService.java              [show sla]' },
-          { type: 'output', content: '│   ├── GamificationService.java     [show gamification]' },
-          { type: 'output', content: '│   └── QRCodeService.java           [show qrcode]' },
-          { type: 'output', content: '├── controller/' },
-          { type: 'output', content: '│   ├── ComplaintController.java     [show complaintcontroller]' },
-          { type: 'output', content: '│   └── AuthController.java          [show authcontroller]' },
-          { type: 'output', content: '├── security/' },
-          { type: 'output', content: '│   ├── SecurityConfig.java          [show security]' },
-          { type: 'output', content: '│   └── JwtTokenProvider.java        [show jwt]' },
-          { type: 'output', content: '└── CmsApplication.java              [show app]' },
-          { type: 'info', content: '' },
+          { type: 'output', content: '' },
+          { type: 'success', content: '📂 java/' },
+          { type: 'output', content: '├── 📁 model/' },
+          { type: 'output', content: '│   ├── 📄 Complaint.java' },
+          { type: 'output', content: '│   ├── 📄 User.java' },
+          { type: 'output', content: '│   └── 📄 Comment.java' },
+          { type: 'output', content: '├── 📁 repository/' },
+          { type: 'output', content: '│   ├── 📄 ComplaintRepository.java' },
+          { type: 'output', content: '│   └── 📄 UserRepository.java' },
+          { type: 'output', content: '├── 📁 service/' },
+          { type: 'output', content: '│   ├── 📄 ComplaintService.java' },
+          { type: 'output', content: '│   ├── 📄 SentimentAnalysisService.java' },
+          { type: 'output', content: '│   ├── 📄 SLAService.java' },
+          { type: 'output', content: '│   ├── 📄 GamificationService.java' },
+          { type: 'output', content: '│   ├── 📄 QRCodeService.java' },
+          { type: 'output', content: '│   └── 📄 NotificationService.java' },
+          { type: 'output', content: '├── 📁 controller/' },
+          { type: 'output', content: '│   ├── 📄 ComplaintController.java' },
+          { type: 'output', content: '│   └── 📄 AuthController.java' },
+          { type: 'output', content: '├── 📁 security/' },
+          { type: 'output', content: '│   ├── 📄 SecurityConfig.java' },
+          { type: 'output', content: '│   ├── 📄 JwtTokenProvider.java' },
+          { type: 'output', content: '│   └── 📄 JwtAuthenticationFilter.java' },
+          { type: 'output', content: '└── 📄 CmsApplication.java' },
+          { type: 'output', content: '' },
+          { type: 'info', content: '5 directories, 17 files' },
+          { type: 'output', content: '' },
         ], 15);
         break;
 
+      case 'find':
+        const searchTerm = args[0]?.toLowerCase();
+        if (!searchTerm) {
+          addLine('error', 'find: missing search term');
+          return;
+        }
+        const matches = Object.entries(CODE_MAP)
+          .filter(([key, val]) => key.includes(searchTerm) || val.name.toLowerCase().includes(searchTerm))
+          .reduce((acc, [_, val]) => {
+            if (!acc.find(v => v.name === val.name)) acc.push(val);
+            return acc;
+          }, [] as typeof CODE_MAP[string][]);
+
+        if (matches.length === 0) {
+          addLine('error', `find: no files matching '${searchTerm}'`);
+        } else {
+          await addLines([
+            { type: 'output', content: '' },
+            { type: 'success', content: `Found ${matches.length} file(s):` },
+            ...matches.map(m => ({ type: 'output' as const, content: `  📄 ${m.path}${m.name}` })),
+            { type: 'output', content: '' },
+          ], 20);
+        }
+        break;
+
+      case 'grep':
+        const grepTerm = args.join(' ').toLowerCase();
+        if (!grepTerm) {
+          addLine('error', 'grep: missing search pattern');
+          return;
+        }
+        const grepMatches = Object.entries(CODE_MAP)
+          .filter(([_, val]) => val.description.toLowerCase().includes(grepTerm))
+          .reduce((acc, [_, val]) => {
+            if (!acc.find(v => v.name === val.name)) acc.push(val);
+            return acc;
+          }, [] as typeof CODE_MAP[string][]);
+
+        if (grepMatches.length === 0) {
+          addLine('output', `(no matches for '${grepTerm}')`);
+        } else {
+          await addLines([
+            { type: 'output', content: '' },
+            ...grepMatches.map(m => ({
+              type: 'output' as const,
+              content: `  ${m.path}${m.name}: ${m.description}`
+            })),
+            { type: 'output', content: '' },
+          ], 20);
+        }
+        break;
+
+      case 'neofetch':
+        await addLines([
+          { type: 'output', content: '' },
+          { type: 'ascii', content: '        ⢀⣤⣴⣶⣶⣶⣦⣤⡀        ' },
+          { type: 'ascii', content: '      ⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄      ' },
+          { type: 'ascii', content: '     ⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦     ' },
+          { type: 'ascii', content: '    ⣼⣿⣿⣿⠋⠉⠙⣿⣿⣿⠋⠉⠙⣿⣿⣧    ' },
+          { type: 'ascii', content: '   ⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇   ' },
+          { type: 'ascii', content: '   ⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇   ' },
+          { type: 'ascii', content: '    ⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟    ' },
+          { type: 'ascii', content: '     ⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁     ' },
+          { type: 'output', content: '' },
+          { type: 'success', content: '  cms-backend@2.0.0' },
+          { type: 'output', content: '  ─────────────────' },
+          { type: 'output', content: '  OS: Spring Boot 3.x' },
+          { type: 'output', content: '  Kernel: Java 17+ (LTS)' },
+          { type: 'output', content: '  Packages: 17 source files' },
+          { type: 'output', content: '  Auth: JWT + BCrypt' },
+          { type: 'output', content: '  DB: JPA/Hibernate' },
+          { type: 'output', content: '  Features: Sentiment, SLA, Gamification' },
+          { type: 'output', content: '' },
+        ], 25);
+        break;
+
       case 'clear':
+      case 'cls':
         setLines([]);
         return;
 
       case 'about':
         await addLines([
-          { type: 'info', content: '' },
-          { type: 'success', content: '🏢 Enterprise Complaint Management System' },
-          { type: 'info', content: '─────────────────────────────────────────' },
-          { type: 'output', content: '  Version: 1.0.0' },
-          { type: 'output', content: '  Framework: Spring Boot 3.x' },
-          { type: 'output', content: '  Language: Java 17+' },
           { type: 'output', content: '' },
-          { type: 'success', content: '✨ Features:' },
-          { type: 'output', content: '  • JWT Authentication & Authorization' },
-          { type: 'output', content: '  • AI-powered Sentiment Analysis' },
-          { type: 'output', content: '  • SLA Monitoring with Auto-Escalation' },
-          { type: 'output', content: '  • Staff Gamification System' },
-          { type: 'output', content: '  • QR Code Tracking' },
-          { type: 'output', content: '  • Role-based Access Control' },
-          { type: 'info', content: '' },
-        ], 25);
+          { type: 'highlight', content: '╭──────────────────────────────────────────────────────────────────╮' },
+          { type: 'highlight', content: '│              🏢 Enterprise CMS - Backend Architecture           │' },
+          { type: 'highlight', content: '╰──────────────────────────────────────────────────────────────────╯' },
+          { type: 'output', content: '' },
+          { type: 'output', content: '  This terminal provides an interactive way to explore the Java' },
+          { type: 'output', content: '  Spring Boot backend code for the Complaint Management System.' },
+          { type: 'output', content: '' },
+          { type: 'success', content: '  Key Technologies:' },
+          { type: 'output', content: '    • Spring Boot 3.x with Spring Security' },
+          { type: 'output', content: '    • JWT Authentication & Authorization' },
+          { type: 'output', content: '    • JPA/Hibernate for ORM' },
+          { type: 'output', content: '    • AI-powered Sentiment Analysis' },
+          { type: 'output', content: '    • SLA Monitoring with Auto-escalation' },
+          { type: 'output', content: '    • Staff Gamification System' },
+          { type: 'output', content: '' },
+        ], 20);
+        break;
+
+      case 'whoami':
+        addLine('output', 'admin');
+        break;
+
+      case 'date':
+        addLine('output', new Date().toString());
+        break;
+
+      case 'echo':
+        addLine('output', args.join(' '));
+        break;
+
+      case 'exit':
+      case 'quit':
+        addLine('info', 'Goodbye! 👋');
         break;
 
       default:
-        addLine('error', `❌ Command not found: ${command}`);
-        addLine('output', '   Type "help" for available commands');
+        addLine('error', `${command}: command not found`);
+        addLine('info', '  Type "help" for available commands');
     }
   };
 
@@ -261,79 +457,104 @@ const JavaSourceViewer: React.FC = () => {
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (historyIndex > 0) {
-        const newIndex = historyIndex - 1;
-        setHistoryIndex(newIndex);
-        setInput(commandHistory[commandHistory.length - 1 - newIndex] || '');
+        setHistoryIndex(historyIndex - 1);
+        setInput(commandHistory[commandHistory.length - historyIndex] || '');
       } else {
         setHistoryIndex(-1);
         setInput('');
       }
+    } else if (e.key === 'Tab') {
+      e.preventDefault();
+      // Simple autocomplete
+      const cmds = ['help', 'ls', 'cd', 'pwd', 'cat', 'tree', 'find', 'grep', 'clear', 'about', 'neofetch'];
+      const match = cmds.find(c => c.startsWith(input.toLowerCase()));
+      if (match) setInput(match);
     }
   };
 
-  const getLineColor = (type: TerminalLine['type']) => {
+  const getLineStyle = (type: TerminalLine['type']) => {
     switch (type) {
       case 'input': return 'text-cyan-400';
       case 'error': return 'text-red-400';
       case 'success': return 'text-emerald-400';
       case 'info': return 'text-slate-500';
-      case 'code': return 'text-amber-300';
+      case 'code': return 'text-amber-200/90';
+      case 'ascii': return 'text-blue-400 font-bold';
+      case 'highlight': return 'text-purple-400';
       default: return 'text-slate-300';
     }
   };
 
   return (
     <div className="min-h-[calc(100vh-200px)] flex flex-col">
-      {/* Terminal Container */}
+      {/* Terminal Container with glow */}
       <div
-        className="flex-1 bg-[#0d1117] rounded-2xl overflow-hidden shadow-2xl border border-slate-700/50"
+        className="flex-1 bg-[#0a0e14] rounded-2xl overflow-hidden border border-cyan-500/20 relative"
         style={{
-          boxShadow: '0 0 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)',
+          boxShadow: '0 0 80px rgba(6, 182, 212, 0.15), 0 0 40px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255,255,255,0.05)',
         }}
       >
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-purple-500/5 animate-pulse" style={{ animationDuration: '4s' }} />
+
+        {/* Scan line effect */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.03]"
+          style={{
+            background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)'
+          }}
+        />
+
         {/* Terminal Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-slate-800 to-slate-900 border-b border-slate-700/50">
+        <div className="relative flex items-center justify-between px-4 py-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-cyan-500/20">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition-colors cursor-pointer shadow-lg shadow-red-500/20"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500 hover:bg-yellow-400 transition-colors cursor-pointer shadow-lg shadow-yellow-500/20"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500 hover:bg-green-400 transition-colors cursor-pointer shadow-lg shadow-green-500/20"></div>
+            <div className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/50 hover:scale-110 transition-transform cursor-pointer"></div>
+            <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/50 hover:scale-110 transition-transform cursor-pointer"></div>
+            <div className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/50 hover:scale-110 transition-transform cursor-pointer"></div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-xs text-slate-400 font-mono">cms-backend-explorer</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50"></div>
+              <span className="text-xs text-emerald-400 font-mono font-bold">LIVE</span>
+            </div>
+            <span className="text-xs text-slate-500 font-mono">cms-backend-explorer</span>
           </div>
-          <div className="text-xs text-slate-500 font-mono">
-            bash
+          <div className="text-xs text-slate-600 font-mono">
+            zsh • java
           </div>
         </div>
 
         {/* Terminal Body */}
         <div
           ref={terminalRef}
-          className="p-4 h-[calc(100vh-320px)] min-h-[400px] overflow-y-auto font-mono text-sm leading-relaxed scroll-smooth"
-          style={{
-            background: 'linear-gradient(180deg, #0d1117 0%, #161b22 100%)',
-          }}
+          className="relative p-5 h-[calc(100vh-320px)] min-h-[450px] overflow-y-auto font-mono text-sm leading-relaxed scroll-smooth"
           onClick={() => inputRef.current?.focus()}
         >
           {/* Lines */}
           {lines.map((line, idx) => (
             <div
               key={idx}
-              className={`${getLineColor(line.type)} ${line.type === 'code' ? 'whitespace-pre-wrap bg-slate-900/50 p-4 rounded-lg my-2 border border-slate-700/30 overflow-x-auto' : ''} animate-in fade-in slide-in-from-bottom-1 duration-200`}
-              style={{ animationDelay: `${idx * 10}ms` }}
+              className={`${getLineStyle(line.type)} ${line.type === 'code'
+                  ? 'whitespace-pre-wrap bg-slate-900/80 p-4 rounded-lg my-3 border border-slate-700/50 overflow-x-auto backdrop-blur-sm shadow-lg'
+                  : ''
+                }`}
+              style={{
+                animation: 'fadeSlideIn 0.15s ease-out forwards',
+                opacity: 0,
+                animationDelay: `${Math.min(idx * 5, 100)}ms`
+              }}
             >
               {line.content}
             </div>
           ))}
 
           {/* Input Line */}
-          <form onSubmit={handleSubmit} className="flex items-center mt-2 group">
-            <span className="text-emerald-400 mr-2 group-focus-within:text-emerald-300 transition-colors">
-              <span className="text-blue-400">cms</span>
-              <span className="text-slate-500">:</span>
-              <span className="text-purple-400">~</span>
-              <span className="text-slate-500">$</span>
+          <form onSubmit={handleSubmit} className="flex items-center mt-3 group">
+            <span className="text-emerald-400 mr-2 font-bold">
+              <span className="text-cyan-400">cms</span>
+              <span className="text-slate-600">:</span>
+              <span className="text-purple-400">~/java{currentDir ? `/${currentDir}` : ''}</span>
+              <span className="text-slate-600">$</span>
             </span>
             <input
               ref={inputRef}
@@ -341,33 +562,62 @@ const JavaSourceViewer: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent text-slate-100 focus:outline-none caret-emerald-400 placeholder-slate-600"
-              placeholder={isTyping ? '' : 'Type a command...'}
+              className="flex-1 bg-transparent text-slate-100 focus:outline-none caret-cyan-400 placeholder-slate-700"
+              placeholder={isTyping ? '' : 'Enter command...'}
               autoFocus
               disabled={isTyping}
+              spellCheck={false}
             />
             {isTyping && (
-              <span className="text-slate-500 animate-pulse">Processing...</span>
+              <span className="text-cyan-500 animate-pulse flex items-center gap-2">
+                <span className="inline-block w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                <span className="inline-block w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                <span className="inline-block w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+              </span>
             )}
           </form>
         </div>
       </div>
 
-      {/* Quick Commands Bar */}
+      {/* Quick Commands with glow */}
       <div className="mt-4 flex flex-wrap gap-2">
-        {['help', 'list', 'tree', 'cat services', 'show sentiment', 'clear'].map((cmd) => (
+        {[
+          { cmd: 'help', icon: '❓' },
+          { cmd: 'ls', icon: '📁' },
+          { cmd: 'tree', icon: '🌳' },
+          { cmd: 'neofetch', icon: '💻' },
+          { cmd: 'cat sentiment', icon: '🧠' },
+          { cmd: 'cat security', icon: '🔐' },
+          { cmd: 'clear', icon: '🧹' },
+        ].map(({ cmd, icon }) => (
           <button
             key={cmd}
             onClick={() => {
-              setInput(cmd);
-              inputRef.current?.focus();
+              if (!isTyping) {
+                processCommand(cmd);
+              }
             }}
-            className="px-3 py-1.5 text-xs font-mono bg-slate-800 text-slate-400 rounded-lg border border-slate-700 hover:bg-slate-700 hover:text-slate-200 hover:border-slate-600 transition-all hover:shadow-lg hover:-translate-y-0.5"
+            className="group px-4 py-2 text-xs font-mono bg-slate-900 text-slate-400 rounded-xl border border-slate-700/50 hover:bg-slate-800 hover:text-cyan-400 hover:border-cyan-500/50 transition-all hover:shadow-lg hover:shadow-cyan-500/10 hover:-translate-y-0.5 active:scale-95"
           >
-            $ {cmd}
+            <span className="mr-2">{icon}</span>
+            <span className="text-slate-500 group-hover:text-slate-400">$</span> {cmd}
           </button>
         ))}
       </div>
+
+      {/* CSS for animations */}
+      <style>{`
+        @keyframes fadeSlideIn {
+          from {
+            opacity: 0;
+            transform: translateY(4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
