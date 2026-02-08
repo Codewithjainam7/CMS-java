@@ -9,7 +9,7 @@ import {
 } from '../utils/javaCodeSnippets';
 
 interface TerminalLine {
-  type: 'input' | 'output' | 'error' | 'success' | 'info' | 'code' | 'ascii' | 'highlight' | 'boot';
+  type: 'input' | 'output' | 'error' | 'success' | 'info' | 'code' | 'ascii' | 'highlight' | 'dim';
   content: string;
 }
 
@@ -21,7 +21,6 @@ interface FileInfo {
   keywords: string[];
 }
 
-// All files with keywords for matching
 const FILES: FileInfo[] = [
   { name: 'Complaint.java', code: JAVA_COMPLAINT_ENTITY, description: 'JPA Entity for complaints with validation', path: 'model/', keywords: ['complaint', 'complaint.java', 'entity', 'model'] },
   { name: 'User.java', code: JAVA_USER_ENTITY, description: 'User entity with Spring Security integration', path: 'model/', keywords: ['user', 'user.java', 'userdetails'] },
@@ -55,50 +54,97 @@ const DIRECTORY_STRUCTURE: Record<string, string[]> = {
   'security': ['SecurityConfig.java', 'JwtTokenProvider.java', 'JwtAuthenticationFilter.java'],
 };
 
-// Java syntax highlighting
 const highlightJavaCode = (code: string): React.ReactNode => {
-  const keywords = ['package', 'import', 'public', 'private', 'protected', 'class', 'interface', 'extends', 'implements', 'static', 'final', 'void', 'return', 'new', 'if', 'else', 'for', 'while', 'try', 'catch', 'throw', 'throws', 'enum', 'default', 'switch', 'case', 'break', 'continue', 'this', 'super', 'null', 'true', 'false', 'instanceof'];
-  const types = ['String', 'int', 'Integer', 'long', 'Long', 'boolean', 'Boolean', 'double', 'Double', 'float', 'List', 'Map', 'Set', 'Optional', 'LocalDateTime', 'Date', 'Object', 'byte', 'User', 'Complaint', 'Sentiment', 'Priority', 'Category', 'ComplaintStatus'];
-  const annotations = /@\w+/g;
+  const lines = code.split('\n');
 
-  return code.split('\n').map((line, lineNum) => {
-    let highlighted = line;
+  return lines.map((line, lineNum) => {
+    // Tokenize the line to avoid nested replacements
+    const tokens: { text: string; className: string }[] = [];
+    let remaining = line;
 
-    // Escape HTML
-    highlighted = highlighted.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    while (remaining.length > 0) {
+      let matched = false;
 
-    // Comments (must be first)
-    highlighted = highlighted.replace(/(\/\/.*$)/gm, '<span class="text-slate-500 italic">$1</span>');
-    highlighted = highlighted.replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="text-slate-500 italic">$1</span>');
+      // Check for comments first
+      const commentMatch = remaining.match(/^(\/\/.*)$/);
+      if (commentMatch) {
+        tokens.push({ text: commentMatch[1], className: 'text-slate-500 italic' });
+        remaining = remaining.slice(commentMatch[1].length);
+        matched = true;
+        continue;
+      }
 
-    // Strings
-    highlighted = highlighted.replace(/(".*?")/g, '<span class="text-amber-400">$1</span>');
+      // Check for strings
+      const stringMatch = remaining.match(/^("[^"]*")/);
+      if (stringMatch) {
+        tokens.push({ text: stringMatch[1], className: 'text-green-400' });
+        remaining = remaining.slice(stringMatch[1].length);
+        matched = true;
+        continue;
+      }
 
-    // Annotations
-    highlighted = highlighted.replace(/(@\w+)/g, '<span class="text-yellow-400">$1</span>');
+      // Check for annotations
+      const annotationMatch = remaining.match(/^(@\w+)/);
+      if (annotationMatch) {
+        tokens.push({ text: annotationMatch[1], className: 'text-yellow-400' });
+        remaining = remaining.slice(annotationMatch[1].length);
+        matched = true;
+        continue;
+      }
 
-    // Keywords
-    keywords.forEach(kw => {
-      const regex = new RegExp(`\\b(${kw})\\b`, 'g');
-      highlighted = highlighted.replace(regex, '<span class="text-purple-400 font-semibold">$1</span>');
-    });
+      // Check for keywords
+      const keywordMatch = remaining.match(/^(package|import|public|private|protected|class|interface|extends|implements|static|final|void|return|new|if|else|for|while|try|catch|throw|throws|enum|default|switch|case|break|continue|this|super|null|true|false|instanceof)\b/);
+      if (keywordMatch) {
+        tokens.push({ text: keywordMatch[1], className: 'text-purple-400 font-semibold' });
+        remaining = remaining.slice(keywordMatch[1].length);
+        matched = true;
+        continue;
+      }
 
-    // Types
-    types.forEach(t => {
-      const regex = new RegExp(`\\b(${t})\\b`, 'g');
-      highlighted = highlighted.replace(regex, '<span class="text-cyan-400">$1</span>');
-    });
+      // Check for types
+      const typeMatch = remaining.match(/^(String|int|Integer|long|Long|boolean|Boolean|double|Double|float|List|Map|Set|Optional|LocalDateTime|Date|Object|byte|User|Complaint|Sentiment|Priority|Category|ComplaintStatus|ResponseEntity|HttpStatus)\b/);
+      if (typeMatch) {
+        tokens.push({ text: typeMatch[1], className: 'text-cyan-400' });
+        remaining = remaining.slice(typeMatch[1].length);
+        matched = true;
+        continue;
+      }
 
-    // Numbers
-    highlighted = highlighted.replace(/\b(\d+)\b/g, '<span class="text-orange-400">$1</span>');
+      // Check for numbers
+      const numberMatch = remaining.match(/^(\d+)/);
+      if (numberMatch) {
+        tokens.push({ text: numberMatch[1], className: 'text-orange-400' });
+        remaining = remaining.slice(numberMatch[1].length);
+        matched = true;
+        continue;
+      }
 
-    // Method calls
-    highlighted = highlighted.replace(/\.(\w+)\(/g, '.<span class="text-blue-400">$1</span>(');
+      // Check for method calls (word followed by parenthesis)
+      const methodMatch = remaining.match(/^\.(\w+)\(/);
+      if (methodMatch) {
+        tokens.push({ text: '.', className: 'text-slate-300' });
+        tokens.push({ text: methodMatch[1], className: 'text-blue-400' });
+        tokens.push({ text: '(', className: 'text-slate-300' });
+        remaining = remaining.slice(methodMatch[0].length);
+        matched = true;
+        continue;
+      }
+
+      // Default: take one character
+      if (!matched) {
+        tokens.push({ text: remaining[0], className: 'text-slate-300' });
+        remaining = remaining.slice(1);
+      }
+    }
 
     return (
       <div key={lineNum} className="flex hover:bg-white/5 transition-colors">
-        <span className="w-12 text-right pr-4 text-slate-600 select-none border-r border-slate-700/50 mr-4">{lineNum + 1}</span>
-        <span dangerouslySetInnerHTML={{ __html: highlighted }} />
+        <span className="w-12 text-right pr-4 text-slate-600 select-none border-r border-slate-700/50 mr-4 flex-shrink-0">{lineNum + 1}</span>
+        <span className="whitespace-pre">
+          {tokens.map((token, i) => (
+            <span key={i} className={token.className}>{token.text}</span>
+          ))}
+        </span>
       </div>
     );
   });
@@ -110,8 +156,7 @@ const JavaSourceViewer: React.FC = () => {
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [isTyping, setIsTyping] = useState(false);
-  const [isBooting, setIsBooting] = useState(true);
-  const [bootProgress, setBootProgress] = useState(0);
+  const [isBooted, setIsBooted] = useState(false);
   const [currentDir, setCurrentDir] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -120,58 +165,73 @@ const JavaSourceViewer: React.FC = () => {
     setLines(prev => [...prev, { type, content }]);
   };
 
-  const addLines = async (newLines: { type: TerminalLine['type']; content: string }[], delay = 15) => {
-    setIsTyping(true);
-    for (const line of newLines) {
-      await new Promise(resolve => setTimeout(resolve, delay));
-      addLine(line.type, line.content);
-    }
-    setIsTyping(false);
-  };
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-  // Boot animation
+  // Boot sequence inside terminal
   useEffect(() => {
-    const boot = async () => {
-      // Animate progress bar
-      for (let i = 0; i <= 100; i += 2) {
-        await new Promise(r => setTimeout(r, 30));
-        setBootProgress(i);
-      }
+    const runBootSequence = async () => {
+      setIsTyping(true);
 
-      await new Promise(r => setTimeout(r, 300));
-      setIsBooting(false);
+      // Initial boot messages
+      addLine('dim', '');
+      await sleep(100);
+      addLine('dim', '[  OK  ] Started CMS Backend Terminal v2.0');
+      await sleep(80);
+      addLine('dim', '[  OK  ] Loading Spring Boot 3.x kernel modules...');
+      await sleep(80);
+      addLine('dim', '[  OK  ] Initializing JPA/Hibernate ORM...');
+      await sleep(80);
+      addLine('dim', '[  OK  ] JWT Security module loaded');
+      await sleep(80);
+      addLine('dim', '[  OK  ] Indexed 17 source files');
+      await sleep(80);
+      addLine('success', '[  OK  ] System ready');
+      await sleep(200);
 
-      // Show welcome after boot
-      await new Promise(r => setTimeout(r, 100));
+      addLine('output', '');
+      await sleep(50);
 
-      const welcomeLines = [
-        { type: 'success' as const, content: '✓ System initialized successfully' },
-        { type: 'output' as const, content: '' },
-        { type: 'highlight' as const, content: '┌────────────────────────────────────────────────────────────────────────┐' },
-        { type: 'highlight' as const, content: '│                                                                        │' },
-        { type: 'ascii' as const, content: '│     ██████╗███╗   ███╗███████╗    ██████╗  █████╗  ██████╗██╗  ██╗    │' },
-        { type: 'ascii' as const, content: '│    ██╔════╝████╗ ████║██╔════╝    ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝    │' },
-        { type: 'ascii' as const, content: '│    ██║     ██╔████╔██║███████╗    ██████╔╝███████║██║     █████╔╝     │' },
-        { type: 'ascii' as const, content: '│    ██║     ██║╚██╔╝██║╚════██║    ██╔══██╗██╔══██║██║     ██╔═██╗     │' },
-        { type: 'ascii' as const, content: '│    ╚██████╗██║ ╚═╝ ██║███████║    ██████╔╝██║  ██║╚██████╗██║  ██╗    │' },
-        { type: 'ascii' as const, content: '│     ╚═════╝╚═╝     ╚═╝╚══════╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝    │' },
-        { type: 'highlight' as const, content: '│                                                                        │' },
-        { type: 'success' as const, content: '│          ⚡ Enterprise Complaint Management System v2.0 ⚡              │' },
-        { type: 'info' as const, content: '│                    Backend Source Code Explorer                        │' },
-        { type: 'highlight' as const, content: '│                                                                        │' },
-        { type: 'highlight' as const, content: '└────────────────────────────────────────────────────────────────────────┘' },
-        { type: 'output' as const, content: '' },
-        { type: 'output' as const, content: '  Welcome! Type "help" for commands or "ls" to list files.' },
-        { type: 'output' as const, content: '' },
-      ];
+      // Simple readable ASCII banner
+      addLine('ascii', '  ╔═══════════════════════════════════════════════════════════════╗');
+      await sleep(30);
+      addLine('ascii', '  ║                                                               ║');
+      await sleep(30);
+      addLine('ascii', '  ║   ██████╗  █████╗   ██████╗  ██╗  ██╗  ███████╗  ███╗   ██╗   ║');
+      await sleep(30);
+      addLine('ascii', '  ║   ██╔══██╗ ██╔══██╗ ██╔════╝ ██║ ██╔╝  ██╔════╝  ████╗  ██║   ║');
+      await sleep(30);
+      addLine('ascii', '  ║   ██████╔╝ ███████║ ██║      █████╔╝   █████╗    ██╔██╗ ██║   ║');
+      await sleep(30);
+      addLine('ascii', '  ║   ██╔══██╗ ██╔══██║ ██║      ██╔═██╗   ██╔══╝    ██║╚██╗██║   ║');
+      await sleep(30);
+      addLine('ascii', '  ║   ██████╔╝ ██║  ██║ ╚██████╗ ██║  ██╗  ███████╗  ██║ ╚████║   ║');
+      await sleep(30);
+      addLine('ascii', '  ║   ╚═════╝  ╚═╝  ╚═╝  ╚═════╝ ╚═╝  ╚═╝  ╚══════╝  ╚═╝  ╚═══╝   ║');
+      await sleep(30);
+      addLine('ascii', '  ║                                                               ║');
+      await sleep(30);
+      addLine('highlight', '  ║   ⚡ CMS Backend - Source Code Explorer                       ║');
+      await sleep(30);
+      addLine('ascii', '  ║                                                               ║');
+      await sleep(30);
+      addLine('ascii', '  ╚═══════════════════════════════════════════════════════════════╝');
+      await sleep(100);
 
-      for (const line of welcomeLines) {
-        await new Promise(r => setTimeout(r, 25));
-        addLine(line.type, line.content);
-      }
+      addLine('output', '');
+      await sleep(50);
+      addLine('info', '  Spring Boot 3.x │ Java 17+ │ JWT Auth │ JPA/Hibernate');
+      await sleep(50);
+      addLine('output', '');
+      await sleep(50);
+      addLine('output', '  Type "help" for commands, "ls" to list files, or "cat <file>" to view code.');
+      await sleep(50);
+      addLine('output', '');
+
+      setIsTyping(false);
+      setIsBooted(true);
     };
 
-    boot();
+    runBootSequence();
   }, []);
 
   useEffect(() => {
@@ -196,39 +256,43 @@ const JavaSourceViewer: React.FC = () => {
 
     if (!command) return;
 
+    setIsTyping(true);
+
     switch (command) {
       case 'help':
       case 'man':
       case '?':
-        await addLines([
-          { type: 'output', content: '' },
-          { type: 'highlight', content: '┌─────────────────────────────────────────────────────────────────┐' },
-          { type: 'highlight', content: '│                    📖 COMMAND REFERENCE                        │' },
-          { type: 'highlight', content: '└─────────────────────────────────────────────────────────────────┘' },
-          { type: 'output', content: '' },
-          { type: 'success', content: '  📁 Navigation:' },
-          { type: 'output', content: '    ls [dir]              List files in directory' },
-          { type: 'output', content: '    cd <dir>              Change directory (cd model, cd ..)' },
-          { type: 'output', content: '    pwd                   Print current directory' },
-          { type: 'output', content: '    tree                  Show full project structure' },
-          { type: 'output', content: '' },
-          { type: 'success', content: '  📄 View Files:' },
-          { type: 'output', content: '    cat <file>            Show file with syntax highlighting' },
-          { type: 'output', content: '    head <file>           Show first 25 lines' },
-          { type: 'output', content: '' },
-          { type: 'info', content: '  💡 File names are flexible! These all work:' },
-          { type: 'output', content: '      cat SLAService' },
-          { type: 'output', content: '      cat slaservice.java' },
-          { type: 'output', content: '      cat sla' },
-          { type: 'output', content: '' },
-          { type: 'success', content: '  🔍 Search:' },
-          { type: 'output', content: '    find <keyword>        Search files by name' },
-          { type: 'output', content: '' },
-          { type: 'success', content: '  ⚙️ System:' },
-          { type: 'output', content: '    clear                 Clear terminal' },
-          { type: 'output', content: '    neofetch              System info' },
-          { type: 'output', content: '' },
-        ], 10);
+        addLine('output', '');
+        await sleep(20);
+        addLine('highlight', '  ┌─────────────────────────────────────────────────────────────┐');
+        addLine('highlight', '  │                    📖 COMMAND REFERENCE                     │');
+        addLine('highlight', '  └─────────────────────────────────────────────────────────────┘');
+        addLine('output', '');
+        await sleep(20);
+        addLine('success', '  📁 Navigation');
+        addLine('output', '     ls [dir]           List files in directory');
+        addLine('output', '     cd <dir>           Change directory (cd model, cd ..)');
+        addLine('output', '     pwd                Print current directory');
+        addLine('output', '     tree               Show full project structure');
+        await sleep(20);
+        addLine('output', '');
+        addLine('success', '  📄 View Files');
+        addLine('output', '     cat <file>         Display file with syntax highlighting');
+        addLine('output', '     head <file>        Show first 25 lines');
+        await sleep(20);
+        addLine('output', '');
+        addLine('info', '  💡 File names are flexible:');
+        addLine('output', '     cat SLAService     cat sla     cat slaservice.java');
+        await sleep(20);
+        addLine('output', '');
+        addLine('success', '  🔍 Search');
+        addLine('output', '     find <keyword>     Search files by name');
+        await sleep(20);
+        addLine('output', '');
+        addLine('success', '  ⚙️ System');
+        addLine('output', '     clear              Clear terminal');
+        addLine('output', '     neofetch           System info');
+        addLine('output', '');
         break;
 
       case 'ls':
@@ -236,22 +300,20 @@ const JavaSourceViewer: React.FC = () => {
         const lsDir = args[0]?.replace(/\/$/, '') || currentDir;
         const lsContents = DIRECTORY_STRUCTURE[lsDir];
         if (!lsContents && lsDir !== '') {
-          addLine('error', `ls: cannot access '${lsDir}': No such directory`);
-          return;
+          addLine('error', `  ls: cannot access '${lsDir}': No such directory`);
+          break;
         }
         const contents = lsContents || DIRECTORY_STRUCTURE[''];
-        await addLines([
-          { type: 'output', content: '' },
-          { type: 'info', content: `  📂 ${lsDir || 'java'}/` },
-          { type: 'output', content: '' },
-          ...contents.map(item => ({
-            type: (item.endsWith('/') ? 'success' : 'output') as const,
-            content: `    ${item.endsWith('/') ? '📁' : '📄'} ${item}`
-          })),
-          { type: 'output', content: '' },
-          { type: 'info', content: `  Total: ${contents.length} items` },
-          { type: 'output', content: '' },
-        ], 15);
+        addLine('output', '');
+        addLine('info', `  📂 ${lsDir || 'java'}/`);
+        addLine('output', '');
+        for (const item of contents) {
+          await sleep(15);
+          addLine(item.endsWith('/') ? 'success' : 'output', `     ${item.endsWith('/') ? '📁' : '📄'} ${item}`);
+        }
+        addLine('output', '');
+        addLine('dim', `  ${contents.length} items`);
+        addLine('output', '');
         break;
 
       case 'cd':
@@ -265,13 +327,12 @@ const JavaSourceViewer: React.FC = () => {
         } else if (DIRECTORY_STRUCTURE[currentDir]?.some(f => f.replace('/', '') === target)) {
           setCurrentDir(target);
         } else {
-          addLine('error', `cd: ${target}: No such directory`);
-          return;
+          addLine('error', `  cd: ${target}: No such directory`);
         }
         break;
 
       case 'pwd':
-        addLine('output', `/java${currentDir ? '/' + currentDir : ''}`);
+        addLine('output', `  /java${currentDir ? '/' + currentDir : ''}`);
         break;
 
       case 'cat':
@@ -281,15 +342,13 @@ const JavaSourceViewer: React.FC = () => {
       case 'open':
       case 'show':
         if (!argJoined) {
-          addLine('error', `${command}: missing file operand`);
+          addLine('error', `  ${command}: missing file operand`);
           addLine('info', '  Usage: cat <filename>  (e.g., cat SLAService)');
-          return;
+          break;
         }
         const file = findFile(argJoined);
         if (!file) {
-          addLine('error', `${command}: ${argJoined}: No such file`);
-          addLine('info', '  💡 Try "ls" to see files, or "find <keyword>" to search');
-          // Show suggestions
+          addLine('error', `  ${command}: ${argJoined}: No such file`);
           const suggestions = FILES.filter(f =>
             f.name.toLowerCase().includes(argJoined.toLowerCase()) ||
             f.keywords.some(k => k.includes(argJoined.toLowerCase()))
@@ -297,80 +356,77 @@ const JavaSourceViewer: React.FC = () => {
           if (suggestions.length > 0) {
             addLine('info', `  Did you mean: ${suggestions.map(s => s.name).join(', ')}?`);
           }
-          return;
+          break;
         }
-        await addLines([
-          { type: 'output', content: '' },
-          { type: 'highlight', content: `┌${'─'.repeat(74)}┐` },
-          { type: 'success', content: `│  📄 ${file.name.padEnd(67)} │` },
-          { type: 'info', content: `│     ${file.description.padEnd(65)} │` },
-          { type: 'info', content: `│     Path: ${(file.path + file.name).padEnd(59)} │` },
-          { type: 'highlight', content: `└${'─'.repeat(74)}┘` },
-          { type: 'output', content: '' },
-        ], 15);
+        addLine('output', '');
+        addLine('highlight', `  ┌${'─'.repeat(70)}┐`);
+        addLine('success', `  │  📄 ${file.name.padEnd(63)} │`);
+        addLine('info', `  │     ${file.description.padEnd(61)} │`);
+        addLine('dim', `  │     ${(file.path + file.name).padEnd(61)} │`);
+        addLine('highlight', `  └${'─'.repeat(70)}┘`);
+        addLine('output', '');
         addLine('code', file.code);
-        await addLines([
-          { type: 'output', content: '' },
-          { type: 'success', content: `  ✓ End of ${file.name} (${file.code.split('\n').length} lines)` },
-          { type: 'output', content: '' },
-        ], 10);
+        addLine('output', '');
+        addLine('success', `  ✓ ${file.name} (${file.code.split('\n').length} lines)`);
+        addLine('output', '');
         break;
 
       case 'head':
         if (!argJoined) {
-          addLine('error', 'head: missing file operand');
-          return;
+          addLine('error', '  head: missing file operand');
+          break;
         }
         const hFile = findFile(argJoined);
         if (!hFile) {
-          addLine('error', `head: ${argJoined}: No such file`);
-          return;
+          addLine('error', `  head: ${argJoined}: No such file`);
+          break;
         }
         const headCode = hFile.code.split('\n').slice(0, 25).join('\n');
         addLine('output', '');
         addLine('info', `  ==> ${hFile.name} (first 25 lines) <==`);
         addLine('output', '');
         addLine('code', headCode);
-        addLine('info', '  ... (use "cat" to see full file)');
+        addLine('dim', '  ... (use "cat" to see full file)');
         addLine('output', '');
         break;
 
       case 'tree':
-        await addLines([
-          { type: 'output', content: '' },
-          { type: 'success', content: '  📂 java/' },
-          { type: 'output', content: '  ├── 📁 model/' },
-          { type: 'output', content: '  │   ├── 📄 Complaint.java' },
-          { type: 'output', content: '  │   ├── 📄 User.java' },
-          { type: 'output', content: '  │   └── 📄 Comment.java' },
-          { type: 'output', content: '  ├── 📁 repository/' },
-          { type: 'output', content: '  │   ├── 📄 ComplaintRepository.java' },
-          { type: 'output', content: '  │   └── 📄 UserRepository.java' },
-          { type: 'output', content: '  ├── 📁 service/' },
-          { type: 'output', content: '  │   ├── 📄 ComplaintService.java' },
-          { type: 'output', content: '  │   ├── 📄 SentimentAnalysisService.java' },
-          { type: 'output', content: '  │   ├── 📄 SLAService.java' },
-          { type: 'output', content: '  │   ├── 📄 GamificationService.java' },
-          { type: 'output', content: '  │   ├── 📄 QRCodeService.java' },
-          { type: 'output', content: '  │   └── 📄 NotificationService.java' },
-          { type: 'output', content: '  ├── 📁 controller/' },
-          { type: 'output', content: '  │   ├── 📄 ComplaintController.java' },
-          { type: 'output', content: '  │   └── 📄 AuthController.java' },
-          { type: 'output', content: '  ├── 📁 security/' },
-          { type: 'output', content: '  │   ├── 📄 SecurityConfig.java' },
-          { type: 'output', content: '  │   ├── 📄 JwtTokenProvider.java' },
-          { type: 'output', content: '  │   └── 📄 JwtAuthenticationFilter.java' },
-          { type: 'output', content: '  └── 📄 CmsApplication.java' },
-          { type: 'output', content: '' },
-          { type: 'info', content: '  5 directories, 17 files' },
-          { type: 'output', content: '' },
-        ], 12);
+        addLine('output', '');
+        addLine('success', '  📂 java/');
+        const treeLines = [
+          '  ├── 📁 model/',
+          '  │   ├── 📄 Complaint.java',
+          '  │   ├── 📄 User.java',
+          '  │   └── 📄 Comment.java',
+          '  ├── 📁 repository/',
+          '  │   ├── 📄 ComplaintRepository.java',
+          '  │   └── 📄 UserRepository.java',
+          '  ├── 📁 service/',
+          '  │   ├── 📄 SentimentAnalysisService.java',
+          '  │   ├── 📄 SLAService.java',
+          '  │   ├── 📄 GamificationService.java',
+          '  │   └── 📄 QRCodeService.java',
+          '  ├── 📁 controller/',
+          '  │   ├── 📄 ComplaintController.java',
+          '  │   └── 📄 AuthController.java',
+          '  ├── 📁 security/',
+          '  │   ├── 📄 SecurityConfig.java',
+          '  │   └── 📄 JwtTokenProvider.java',
+          '  └── 📄 CmsApplication.java',
+        ];
+        for (const line of treeLines) {
+          await sleep(20);
+          addLine('output', line);
+        }
+        addLine('output', '');
+        addLine('dim', '  5 directories, 17 files');
+        addLine('output', '');
         break;
 
       case 'find':
         if (!argJoined) {
-          addLine('error', 'find: missing search term');
-          return;
+          addLine('error', '  find: missing search term');
+          break;
         }
         const matches = FILES.filter(f =>
           f.name.toLowerCase().includes(argJoined.toLowerCase()) ||
@@ -381,47 +437,44 @@ const JavaSourceViewer: React.FC = () => {
         if (matches.length === 0) {
           addLine('output', `  No files matching '${argJoined}'`);
         } else {
-          await addLines([
-            { type: 'output', content: '' },
-            { type: 'success', content: `  Found ${matches.length} file(s):` },
-            { type: 'output', content: '' },
-            ...matches.map(m => ({ type: 'output' as const, content: `    📄 ${m.path}${m.name}` })),
-            { type: 'output', content: '' },
-            { type: 'info', content: `  💡 Type "cat ${matches[0].name.replace('.java', '').toLowerCase()}" to view` },
-            { type: 'output', content: '' },
-          ], 15);
+          addLine('output', '');
+          addLine('success', `  Found ${matches.length} file(s):`);
+          addLine('output', '');
+          for (const m of matches) {
+            await sleep(20);
+            addLine('output', `     📄 ${m.path}${m.name}`);
+          }
+          addLine('output', '');
+          addLine('info', `  💡 Type "cat ${matches[0].name.replace('.java', '').toLowerCase()}" to view`);
+          addLine('output', '');
         }
         break;
 
       case 'neofetch':
-        await addLines([
-          { type: 'output', content: '' },
-          { type: 'ascii', content: '         ████████████████████          cms-backend@2.0.0' },
-          { type: 'ascii', content: '       ██                    ██        ─────────────────────' },
-          { type: 'ascii', content: '     ██   ████████████████   ██       OS: Spring Boot 3.2' },
-          { type: 'ascii', content: '    ██   ██              ██   ██      Host: JVM 17+ (LTS)' },
-          { type: 'ascii', content: '   ██   ██  ██████████  ██   ██       Kernel: Vite 6.x' },
-          { type: 'ascii', content: '   ██   ██  ██      ██  ██   ██       Packages: 17 (java)' },
-          { type: 'ascii', content: '   ██   ██  ██████████  ██   ██       Shell: cms-terminal' },
-          { type: 'ascii', content: '    ██   ██              ██   ██      Auth: JWT + BCrypt' },
-          { type: 'ascii', content: '     ██   ████████████████   ██       Memory: JPA/Hibernate' },
-          { type: 'ascii', content: '       ██                    ██       ' },
-          { type: 'ascii', content: '         ████████████████████         ████████████████████' },
-          { type: 'output', content: '' },
-        ], 20);
+        addLine('output', '');
+        addLine('ascii', '       .---.                 cms-backend@2.0');
+        addLine('ascii', '      /     \\                ─────────────────');
+        addLine('ascii', '      \\.@-@./                OS: Spring Boot 3.2');
+        addLine('ascii', '      /`\\_/`\\                Kernel: JVM 17+ LTS');
+        addLine('ascii', '     //  _  \\\\               Shell: cms-terminal');
+        addLine('ascii', '    | \\     )|_              Packages: 17 (java)');
+        addLine('ascii', '   /`\\_`>  <_/ \\             Auth: JWT + BCrypt');
+        addLine('ascii', '   \\__/\'---\'\\__/             DB: JPA/Hibernate');
+        addLine('output', '');
         break;
 
       case 'clear':
       case 'cls':
         setLines([]);
+        setIsTyping(false);
         return;
 
       case 'whoami':
-        addLine('output', '  admin (root)');
+        addLine('output', '  admin');
         break;
 
       case 'date':
-        addLine('output', `  ${new Date().toString()}`);
+        addLine('output', `  ${new Date().toLocaleString()}`);
         break;
 
       case 'echo':
@@ -432,11 +485,13 @@ const JavaSourceViewer: React.FC = () => {
         addLine('error', `  ${command}: command not found`);
         addLine('info', '  Type "help" for available commands');
     }
+
+    setIsTyping(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isTyping || isBooting) return;
+    if (!input.trim() || isTyping || !isBooted) return;
 
     setCommandHistory(prev => [...prev, input]);
     setHistoryIndex(-1);
@@ -474,170 +529,100 @@ const JavaSourceViewer: React.FC = () => {
       case 'input': return 'text-cyan-400';
       case 'error': return 'text-red-400';
       case 'success': return 'text-emerald-400';
-      case 'info': return 'text-slate-500';
+      case 'info': return 'text-slate-400';
+      case 'dim': return 'text-slate-600';
       case 'code': return '';
-      case 'ascii': return 'text-cyan-400 font-bold';
+      case 'ascii': return 'text-cyan-400';
       case 'highlight': return 'text-purple-400';
-      case 'boot': return 'text-green-400';
       default: return 'text-slate-300';
     }
   };
 
-  // Boot screen
-  if (isBooting) {
-    return (
-      <div className="min-h-[calc(100vh-200px)] flex items-center justify-center bg-[#0a0e14] rounded-2xl border border-cyan-500/20 overflow-hidden relative">
-        {/* Animated gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-purple-500/5 to-blue-500/10 animate-pulse" />
-
-        <div className="text-center z-10 px-8">
-          {/* Spinning logo */}
-          <div className="mb-8 relative">
-            <div className="w-24 h-24 mx-auto border-4 border-cyan-500/30 rounded-2xl animate-spin" style={{ animationDuration: '3s' }} />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-4xl">⚡</span>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-bold text-white mb-2">CMS Backend Terminal</h2>
-          <p className="text-slate-400 mb-8">Initializing source explorer...</p>
-
-          {/* Progress bar */}
-          <div className="w-80 mx-auto">
-            <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 transition-all duration-100 ease-out rounded-full"
-                style={{ width: `${bootProgress}%` }}
-              />
-            </div>
-            <div className="flex justify-between mt-2 text-xs text-slate-500">
-              <span>Loading modules...</span>
-              <span>{bootProgress}%</span>
-            </div>
-          </div>
-
-          {/* Boot messages */}
-          <div className="mt-6 text-left text-xs font-mono text-slate-600 space-y-1 max-w-md mx-auto">
-            {bootProgress > 20 && <div className="animate-pulse">✓ Spring Boot initialized</div>}
-            {bootProgress > 40 && <div className="animate-pulse">✓ JPA/Hibernate loaded</div>}
-            {bootProgress > 60 && <div className="animate-pulse">✓ Security module ready</div>}
-            {bootProgress > 80 && <div className="animate-pulse">✓ Source files indexed</div>}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-[calc(100vh-200px)] flex flex-col">
-      {/* Terminal Container */}
+      {/* Terminal */}
       <div
-        className="flex-1 bg-[#0a0e14] rounded-2xl overflow-hidden border border-cyan-500/30 relative"
-        style={{
-          boxShadow: '0 0 60px rgba(6, 182, 212, 0.1), 0 0 30px rgba(139, 92, 246, 0.08), inset 0 1px 0 rgba(255,255,255,0.03)',
-        }}
+        className="flex-1 bg-[#0d1117] rounded-2xl overflow-hidden border border-slate-700/50 shadow-2xl"
       >
-        {/* Terminal Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700/50">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-slate-700/50">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 shadow-lg shadow-red-500/30 hover:scale-110 transition-transform cursor-pointer" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/30 hover:scale-110 transition-transform cursor-pointer" />
-            <div className="w-3 h-3 rounded-full bg-green-500 shadow-lg shadow-green-500/30 hover:scale-110 transition-transform cursor-pointer" />
+            <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
+            <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
+            <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs text-emerald-400 font-mono">ONLINE</span>
-            </div>
-          </div>
-          <span className="text-xs text-slate-600 font-mono">cms-backend-explorer</span>
+          <span className="text-sm text-slate-400 font-mono">cms-backend — bash</span>
+          <div className="w-16" />
         </div>
 
-        {/* Terminal Body */}
+        {/* Body */}
         <div
           ref={terminalRef}
-          className="p-5 h-[calc(100vh-320px)] min-h-[450px] overflow-y-auto font-mono text-[13px] leading-relaxed"
+          className="p-4 h-[calc(100vh-320px)] min-h-[450px] overflow-y-auto font-mono text-sm leading-relaxed"
           onClick={() => inputRef.current?.focus()}
         >
           {lines.map((line, idx) => (
             <div
               key={idx}
               className={`${getLineStyle(line.type)} ${line.type === 'code'
-                  ? 'my-3 bg-[#0d1117] border border-slate-700/50 rounded-xl overflow-hidden shadow-xl'
-                  : ''
+                ? 'my-3 bg-[#161b22] border border-slate-700/30 rounded-lg overflow-hidden'
+                : ''
                 }`}
-              style={{ animation: 'fadeIn 0.2s ease-out' }}
             >
               {line.type === 'code' ? (
                 <div className="overflow-x-auto">
-                  <div className="bg-slate-800/50 px-4 py-2 border-b border-slate-700/50 text-xs text-slate-500">
-                    💻 Source Code
+                  <div className="bg-[#21262d] px-4 py-2 border-b border-slate-700/30 text-xs text-slate-500 flex items-center gap-2">
+                    <span className="text-cyan-400">●</span> Source Code
                   </div>
-                  <div className="p-4 text-[12px] leading-relaxed">
+                  <div className="p-4 text-[13px] leading-relaxed">
                     {highlightJavaCode(line.content)}
                   </div>
                 </div>
               ) : (
-                line.content
+                <span className="whitespace-pre">{line.content}</span>
               )}
             </div>
           ))}
 
-          {/* Input Line */}
-          <form onSubmit={handleSubmit} className="flex items-center mt-3">
-            <span className="text-emerald-400 mr-2">
-              <span className="text-cyan-400">cms</span>
-              <span className="text-slate-600">:</span>
-              <span className="text-purple-400">~/java{currentDir ? `/${currentDir}` : ''}</span>
-              <span className="text-slate-600">$</span>
-            </span>
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              className="flex-1 bg-transparent text-slate-100 focus:outline-none caret-cyan-400 placeholder-slate-700"
-              placeholder="Type a command..."
-              autoFocus
-              disabled={isTyping}
-              spellCheck={false}
-            />
-            {isTyping && (
-              <span className="text-cyan-500 animate-pulse">●●●</span>
-            )}
-          </form>
+          {/* Prompt */}
+          {isBooted && (
+            <form onSubmit={handleSubmit} className="flex items-center mt-1">
+              <span className="mr-2">
+                <span className="text-emerald-400">cms</span>
+                <span className="text-slate-500">:</span>
+                <span className="text-cyan-400">~/java{currentDir ? `/${currentDir}` : ''}</span>
+                <span className="text-slate-500">$</span>
+              </span>
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="flex-1 bg-transparent text-slate-200 focus:outline-none caret-slate-200 placeholder-slate-700"
+                placeholder={isTyping ? '' : 'Type a command...'}
+                autoFocus
+                disabled={isTyping}
+                spellCheck={false}
+              />
+              {isTyping && <span className="text-slate-500 animate-pulse">▋</span>}
+            </form>
+          )}
         </div>
       </div>
 
-      {/* Quick Commands */}
+      {/* Quick buttons */}
       <div className="mt-4 flex flex-wrap gap-2">
-        {[
-          { cmd: 'help', icon: '❓' },
-          { cmd: 'ls', icon: '📁' },
-          { cmd: 'tree', icon: '🌳' },
-          { cmd: 'cat sla', icon: '📄' },
-          { cmd: 'cat security', icon: '🔐' },
-          { cmd: 'find jwt', icon: '🔍' },
-          { cmd: 'neofetch', icon: '💻' },
-          { cmd: 'clear', icon: '🧹' },
-        ].map(({ cmd, icon }) => (
+        {['help', 'ls', 'tree', 'cat sla', 'cat jwt', 'cat auth', 'neofetch', 'clear'].map(cmd => (
           <button
             key={cmd}
-            onClick={() => !isTyping && processCommand(cmd)}
-            className="px-4 py-2 text-xs font-mono bg-slate-900 text-slate-400 rounded-xl border border-slate-700/50 hover:bg-slate-800 hover:text-cyan-400 hover:border-cyan-500/50 transition-all hover:shadow-lg hover:shadow-cyan-500/10 hover:-translate-y-0.5 active:scale-95"
+            onClick={() => !isTyping && isBooted && processCommand(cmd)}
+            className="px-3 py-1.5 text-xs font-mono bg-[#21262d] text-slate-400 rounded-lg border border-slate-700/50 hover:bg-[#30363d] hover:text-slate-200 transition-all"
           >
-            <span className="mr-2">{icon}</span>$ {cmd}
+            $ {cmd}
           </button>
         ))}
       </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(2px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 };
