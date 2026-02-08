@@ -1,17 +1,19 @@
 
 import React, { useState, useEffect } from 'react';
-import { Complaint, ComplaintStatus, Comment, User, UserRole } from '../types';
+import { Complaint, ComplaintStatus, Comment, User, UserRole, Feedback } from '../types';
 import { Send, Paperclip, CheckCircle, Timer, MessageSquare, ArrowLeft, MoreHorizontal, FileText, Download, Building, MapPin, Calendar, Phone, BadgeCheck, AlertTriangle } from 'lucide-react';
+import FeedbackForm from '../components/FeedbackForm';
 
 interface ComplaintDetailProps {
     complaint: Complaint;
     currentUser: User;
     onBack: () => void;
     onStatusChange: (id: string, status: ComplaintStatus) => void;
+    onFeedbackSubmit?: (complaintId: string, rating: number, comment: string) => void;
     isDarkMode: boolean;
 }
 
-const ComplaintDetail: React.FC<ComplaintDetailProps> = ({ complaint, currentUser, onBack, onStatusChange, isDarkMode }) => {
+const ComplaintDetail: React.FC<ComplaintDetailProps> = ({ complaint, currentUser, onBack, onStatusChange, onFeedbackSubmit, isDarkMode }) => {
     const [commentText, setCommentText] = useState('');
     const [comments, setComments] = useState<Comment[]>([
         { id: 'c1', complaintId: complaint.id, userId: complaint.customerId, userName: complaint.customerName, content: 'When can I expect a resolution?', isInternal: false, createdAt: new Date(Date.now() - 3600000).toISOString() }
@@ -114,7 +116,7 @@ const ComplaintDetail: React.FC<ComplaintDetailProps> = ({ complaint, currentUse
                     </div>
 
                     <div className="flex items-center gap-3 mt-4 md:mt-0 w-full md:w-auto">
-                        {currentUser.role !== UserRole.CUSTOMER && complaint.status !== ComplaintStatus.RESOLVED && (
+                        {currentUser.role !== UserRole.STUDENT && complaint.status !== ComplaintStatus.RESOLVED && (
                             <button
                                 onClick={() => onStatusChange(complaint.id, ComplaintStatus.RESOLVED)}
                                 className="flex-1 md:flex-none justify-center bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-emerald-500/20 flex items-center transform hover:-translate-y-0.5"
@@ -275,57 +277,59 @@ const ComplaintDetail: React.FC<ComplaintDetailProps> = ({ complaint, currentUse
 
                 {/* Right Column: AI & Chat */}
                 <div className="space-y-8">
-                    {/* AI Intelligence Card */}
-                    <div className={`rounded-3xl shadow-sm border p-6 ${cardClass} relative overflow-hidden group`}>
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-bl-full -z-0 transition-transform group-hover:scale-110"></div>
+                    {/* AI Intelligence Card - Admin Only */}
+                    {currentUser.role === UserRole.ADMIN && (
+                        <div className={`rounded-3xl shadow-sm border p-6 ${cardClass} relative overflow-hidden group`}>
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-bl-full -z-0 transition-transform group-hover:scale-110"></div>
 
-                        <h3 className={`text-xs font-bold uppercase tracking-wider mb-6 flex items-center ${textSecondary}`}>
-                            <BadgeCheck size={14} className="mr-2 text-purple-500" /> AI Analysis
-                        </h3>
+                            <h3 className={`text-xs font-bold uppercase tracking-wider mb-6 flex items-center ${textSecondary}`}>
+                                <BadgeCheck size={14} className="mr-2 text-purple-500" /> AI Analysis
+                            </h3>
 
-                        <div className="space-y-6 relative z-10">
-                            {/* Sentiment */}
-                            <div>
-                                <div className="flex justify-between items-center mb-2">
-                                    <span className={`text-sm font-semibold ${textPrimary}`}>Sentiment Score</span>
-                                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${complaint.sentiment === 'ANGRY' ? 'bg-red-100 text-red-600' :
-                                        complaint.sentiment === 'FRUSTRATED' ? 'bg-orange-100 text-orange-600' :
-                                            complaint.sentiment === 'SATISFIED' ? 'bg-green-100 text-green-600' :
-                                                'bg-slate-100 text-slate-600'
-                                        }`}>
-                                        {complaint.sentiment}
-                                    </span>
-                                </div>
-                                <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div className={`h-full rounded-full transition-all duration-1000 ${complaint.sentiment === 'ANGRY' ? 'bg-red-500 w-[85%]' :
-                                        complaint.sentiment === 'FRUSTRATED' ? 'bg-orange-500 w-[60%]' :
-                                            complaint.sentiment === 'NEUTRAL' ? 'bg-blue-400 w-[40%]' : 'bg-emerald-500 w-[20%]'
-                                        }`}></div>
-                                </div>
-                            </div>
-
-                            {/* SLA Status */}
-                            <div>
-                                <div className="flex justify-between items-center mb-2">
-                                    <span className={`text-sm font-semibold ${textPrimary}`}>SLA Deadline</span>
-                                    {isSlaBreached && (
-                                        <span className="flex items-center text-xs font-bold text-red-500 animate-pulse">
-                                            <AlertTriangle size={12} className="mr-1" /> BREACHED
+                            <div className="space-y-6 relative z-10">
+                                {/* Sentiment */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className={`text-sm font-semibold ${textPrimary}`}>Sentiment Score</span>
+                                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${complaint.sentiment === 'ANGRY' ? 'bg-red-100 text-red-600' :
+                                            complaint.sentiment === 'FRUSTRATED' ? 'bg-orange-100 text-orange-600' :
+                                                complaint.sentiment === 'SATISFIED' ? 'bg-green-100 text-green-600' :
+                                                    'bg-slate-100 text-slate-600'
+                                            }`}>
+                                            {complaint.sentiment}
                                         </span>
-                                    )}
-                                </div>
-                                <div className={`flex items-center p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-600' : 'bg-slate-50 border-slate-200'}`}>
-                                    <div className={`p-2 rounded-lg mr-3 ${isDarkMode ? 'bg-slate-700 text-slate-300' : 'bg-white text-slate-500 shadow-sm'}`}>
-                                        <Timer size={18} />
                                     </div>
-                                    <div>
-                                        <p className={`text-xs text-slate-400 font-bold uppercase`}>Time Remaining</p>
-                                        <p className={`font-mono font-bold ${isSlaBreached ? 'text-red-500' : textPrimary}`}>{timeLeft}</p>
+                                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                                        <div className={`h-full rounded-full transition-all duration-1000 ${complaint.sentiment === 'ANGRY' ? 'bg-red-500 w-[85%]' :
+                                            complaint.sentiment === 'FRUSTRATED' ? 'bg-orange-500 w-[60%]' :
+                                                complaint.sentiment === 'NEUTRAL' ? 'bg-blue-400 w-[40%]' : 'bg-emerald-500 w-[20%]'
+                                            }`}></div>
+                                    </div>
+                                </div>
+
+                                {/* SLA Status */}
+                                <div>
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className={`text-sm font-semibold ${textPrimary}`}>SLA Deadline</span>
+                                        {isSlaBreached && (
+                                            <span className="flex items-center text-xs font-bold text-red-500 animate-pulse">
+                                                <AlertTriangle size={12} className="mr-1" /> BREACHED
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className={`flex items-center p-3 rounded-xl border ${isDarkMode ? 'bg-slate-800 border-slate-600' : 'bg-slate-50 border-slate-200'}`}>
+                                        <div className={`p-2 rounded-lg mr-3 ${isDarkMode ? 'bg-slate-700 text-slate-300' : 'bg-white text-slate-500 shadow-sm'}`}>
+                                            <Timer size={18} />
+                                        </div>
+                                        <div>
+                                            <p className={`text-xs text-slate-400 font-bold uppercase`}>Time Remaining</p>
+                                            <p className={`font-mono font-bold ${isSlaBreached ? 'text-red-500' : textPrimary}`}>{timeLeft}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* Chat / Discussion */}
                     <div className={`rounded-3xl shadow-sm border flex flex-col overflow-hidden h-[500px] ${cardClass}`}>
@@ -380,9 +384,20 @@ const ComplaintDetail: React.FC<ComplaintDetailProps> = ({ complaint, currentUse
                             </div>
                         </div>
                     </div>
+
+                    {/* Feedback Form - For Students/Victims on Resolved Complaints */}
+                    {(currentUser.role === UserRole.STUDENT || currentUser.role === UserRole.VICTIM) &&
+                        (complaint.status === ComplaintStatus.RESOLVED || complaint.status === ComplaintStatus.CLOSED) && (
+                            <FeedbackForm
+                                complaintId={complaint.id}
+                                existingFeedback={complaint.feedback}
+                                onSubmit={(rating, comment) => onFeedbackSubmit?.(complaint.id, rating, comment)}
+                                isDarkMode={isDarkMode}
+                            />
+                        )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

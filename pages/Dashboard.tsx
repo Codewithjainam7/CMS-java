@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { TrendingUp, AlertCircle, CheckCircle, Clock, Award, BarChart3, Users, Activity, Sparkles } from 'lucide-react';
+import { TrendingUp, AlertCircle, CheckCircle, Clock, Award, BarChart3, Users, Activity, Sparkles, Star, MessageSquare } from 'lucide-react';
 import { User, Complaint, ComplaintStatus, UserRole, Priority } from '../types';
 import { MOCK_USERS } from '../services/mockService';
 
@@ -384,9 +384,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, complaints, isDarkMode }) =
               >
                 <div className="flex items-center space-x-4">
                   <div className={`font-bold w-7 h-7 flex items-center justify-center rounded-lg text-sm ${index === 0 ? 'bg-amber-500 text-white' :
-                      index === 1 ? 'bg-slate-400 text-white' :
-                        index === 2 ? 'bg-amber-700 text-white' :
-                          (isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-200 text-slate-500')
+                    index === 1 ? 'bg-slate-400 text-white' :
+                      index === 2 ? 'bg-amber-700 text-white' :
+                        (isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-200 text-slate-500')
                     }`}>
                     {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`}
                   </div>
@@ -410,6 +410,60 @@ const Dashboard: React.FC<DashboardProps> = ({ user, complaints, isDarkMode }) =
           </div>
         </PremiumCard>
       </div>
+
+      {/* Recent Feedback Section */}
+      <PremiumCard className="col-span-full">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className={`text-lg font-bold flex items-center ${textPrimary}`}>
+            <MessageSquare size={20} className="mr-2 text-purple-500" /> Recent Feedback
+          </h3>
+          <span className={`text-xs font-bold ${textSecondary}`}>From Resolved Complaints</span>
+        </div>
+
+        {complaints.filter(c => c.feedback).length === 0 ? (
+          <p className={`text-center py-8 ${textSecondary}`}>No feedback received yet</p>
+        ) : (
+          <div className="space-y-4">
+            {complaints
+              .filter(c => c.feedback)
+              .slice(0, 5)
+              .map(c => (
+                <div
+                  key={c.id}
+                  className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-700/30 border-slate-600/50' : 'bg-slate-50 border-slate-200'}`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`text-sm font-bold ${textPrimary}`}>{c.id}</span>
+                        <span className={`text-xs ${textSecondary}`}>•</span>
+                        <span className={`text-xs ${textSecondary}`}>{c.customerName}</span>
+                      </div>
+                      <p className={`text-sm mb-2 ${textSecondary}`}>{c.title}</p>
+                      {c.feedback?.comment && (
+                        <p className={`text-sm italic ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                          "{c.feedback.comment}"
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 ml-4">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <Star
+                          key={star}
+                          size={16}
+                          className={star <= (c.feedback?.rating || 0) ? 'text-amber-400 fill-amber-400' : 'text-slate-300'}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p className={`text-xs mt-2 ${textSecondary}`}>
+                    Submitted: {c.feedback?.submittedAt ? new Date(c.feedback.submittedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                  </p>
+                </div>
+              ))}
+          </div>
+        )}
+      </PremiumCard>
     </div>
   );
 

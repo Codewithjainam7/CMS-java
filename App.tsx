@@ -90,6 +90,20 @@ const App = () => {
         }
     };
 
+    const handleFeedbackSubmit = (complaintId: string, rating: number, comment: string) => {
+        setComplaints(complaints.map(c =>
+            c.id === complaintId ? {
+                ...c,
+                feedback: {
+                    rating,
+                    comment,
+                    submittedAt: new Date().toISOString()
+                }
+            } : c
+        ));
+        addNotification(`Thank you for your feedback on ${complaintId}!`, 'success');
+    };
+
     if (!isAuthenticated || !currentUser) {
         return <Login onLogin={handleLogin} />;
     }
@@ -103,6 +117,7 @@ const App = () => {
                     currentUser={currentUser}
                     onBack={() => setSelectedComplaintId(null)}
                     onStatusChange={handleStatusChange}
+                    onFeedbackSubmit={handleFeedbackSubmit}
                     isDarkMode={isDarkMode}
                 />
             );

@@ -56,6 +56,13 @@ export interface Complaint {
   contactNumber?: string;
   incidentDate?: string;
   incidentLocation?: string;
+  feedback?: Feedback; // Resolution feedback
+}
+
+export interface Feedback {
+  rating: number; // 1-5 stars
+  comment?: string;
+  submittedAt: string; // ISO String
 }
 
 export interface Comment {
