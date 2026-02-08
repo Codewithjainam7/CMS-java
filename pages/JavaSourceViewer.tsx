@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import {
   JAVA_COMPLAINT_ENTITY, JAVA_USER_ENTITY,
@@ -7,6 +8,7 @@ import {
   JAVA_SECURITY, JAVA_JWT_PROVIDER,
   JAVA_APPLICATION
 } from '../utils/javaCodeSnippets';
+import { Terminal, Maximize2, Minimize2, X, Play } from 'lucide-react';
 
 interface TerminalLine {
   type: 'input' | 'output' | 'error' | 'success' | 'info' | 'code' | 'ascii' | 'highlight' | 'dim';
@@ -77,7 +79,7 @@ const highlightJavaCode = (code: string): React.ReactElement[] => {
       // Check for strings
       const stringMatch = remaining.match(/^("[^"]*")/);
       if (stringMatch) {
-        tokens.push({ text: stringMatch[1], className: 'text-green-400' });
+        tokens.push({ text: stringMatch[1], className: 'text-emerald-300' });
         remaining = remaining.slice(stringMatch[1].length);
         matched = true;
         continue;
@@ -86,7 +88,7 @@ const highlightJavaCode = (code: string): React.ReactElement[] => {
       // Check for annotations
       const annotationMatch = remaining.match(/^(@\w+)/);
       if (annotationMatch) {
-        tokens.push({ text: annotationMatch[1], className: 'text-yellow-400' });
+        tokens.push({ text: annotationMatch[1], className: 'text-yellow-300' });
         remaining = remaining.slice(annotationMatch[1].length);
         matched = true;
         continue;
@@ -104,7 +106,7 @@ const highlightJavaCode = (code: string): React.ReactElement[] => {
       // Check for types
       const typeMatch = remaining.match(/^(String|int|Integer|long|Long|boolean|Boolean|double|Double|float|List|Map|Set|Optional|LocalDateTime|Date|Object|byte|User|Complaint|Sentiment|Priority|Category|ComplaintStatus|ResponseEntity|HttpStatus)\b/);
       if (typeMatch) {
-        tokens.push({ text: typeMatch[1], className: 'text-cyan-400' });
+        tokens.push({ text: typeMatch[1], className: 'text-cyan-300' });
         remaining = remaining.slice(typeMatch[1].length);
         matched = true;
         continue;
@@ -113,7 +115,7 @@ const highlightJavaCode = (code: string): React.ReactElement[] => {
       // Check for numbers
       const numberMatch = remaining.match(/^(\d+)/);
       if (numberMatch) {
-        tokens.push({ text: numberMatch[1], className: 'text-orange-400' });
+        tokens.push({ text: numberMatch[1], className: 'text-orange-300' });
         remaining = remaining.slice(numberMatch[1].length);
         matched = true;
         continue;
@@ -122,9 +124,9 @@ const highlightJavaCode = (code: string): React.ReactElement[] => {
       // Check for method calls (word followed by parenthesis)
       const methodMatch = remaining.match(/^\.(\w+)\(/);
       if (methodMatch) {
-        tokens.push({ text: '.', className: 'text-slate-300' });
-        tokens.push({ text: methodMatch[1], className: 'text-blue-400' });
-        tokens.push({ text: '(', className: 'text-slate-300' });
+        tokens.push({ text: '.', className: 'text-slate-400' });
+        tokens.push({ text: methodMatch[1], className: 'text-blue-300' });
+        tokens.push({ text: '(', className: 'text-slate-400' });
         remaining = remaining.slice(methodMatch[0].length);
         matched = true;
         continue;
@@ -138,9 +140,9 @@ const highlightJavaCode = (code: string): React.ReactElement[] => {
     }
 
     return (
-      <div key={lineNum} className="flex hover:bg-white/5 transition-colors">
-        <span className="w-12 text-right pr-4 text-slate-600 select-none border-r border-slate-700/50 mr-4 flex-shrink-0">{lineNum + 1}</span>
-        <span className="whitespace-pre">
+      <div key={lineNum} className="flex hover:bg-white/5 transition-colors group">
+        <span className="w-12 text-right pr-4 text-slate-600 select-none border-r border-slate-700/50 mr-4 flex-shrink-0 group-hover:text-slate-500 transition-colors font-mono text-xs pt-0.5">{lineNum + 1}</span>
+        <span className="whitespace-pre font-mono text-[13px]">
           {tokens.map((token, i) => (
             <span key={i} className={token.className}>{token.text}</span>
           ))}
@@ -175,7 +177,7 @@ const JavaSourceViewer: React.FC = () => {
       // Initial boot messages
       addLine('dim', '');
       await sleep(100);
-      addLine('dim', '[  OK  ] Started CMS Backend Terminal v2.0');
+      addLine('dim', '[  OK  ] Started CMS Backend Terminal v2.0 (Glass Kernel)');
       await sleep(80);
       addLine('dim', '[  OK  ] Loading Spring Boot 3.x kernel modules...');
       await sleep(80);
@@ -183,7 +185,7 @@ const JavaSourceViewer: React.FC = () => {
       await sleep(80);
       addLine('dim', '[  OK  ] JWT Security module loaded');
       await sleep(80);
-      addLine('dim', '[  OK  ] Indexed 17 source files');
+      addLine('dim', '[  OK  ] Mounted filesystem: /java (Read-Only)');
       await sleep(80);
       addLine('success', '[  OK  ] System ready');
       await sleep(200);
@@ -194,19 +196,13 @@ const JavaSourceViewer: React.FC = () => {
       // Simple readable ASCII banner
       addLine('ascii', '');
       addLine('ascii', '    ██████╗ ███╗   ███╗ ███████╗    ██████╗  █████╗  ██████╗██╗  ██╗███████╗███╗   ██╗██████╗ ');
-      await sleep(25);
       addLine('ascii', '   ██╔════╝ ████╗ ████║ ██╔════╝    ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔════╝████╗  ██║██╔══██╗');
-      await sleep(25);
       addLine('ascii', '   ██║      ██╔████╔██║ ███████╗    ██████╔╝███████║██║     █████╔╝ █████╗  ██╔██╗ ██║██║  ██║');
-      await sleep(25);
       addLine('ascii', '   ██║      ██║╚██╔╝██║ ╚════██║    ██╔══██╗██╔══██║██║     ██╔═██╗ ██╔══╝  ██║╚██╗██║██║  ██║');
-      await sleep(25);
       addLine('ascii', '   ╚██████╗ ██║ ╚═╝ ██║ ███████║    ██████╔╝██║  ██║╚██████╗██║  ██╗███████╗██║ ╚████║██████╔╝');
-      await sleep(25);
       addLine('ascii', '    ╚═════╝ ╚═╝     ╚═╝ ╚══════╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═════╝ ');
-      await sleep(25);
       addLine('ascii', '');
-      await sleep(50);
+      await sleep(100);
       addLine('highlight', '                        ⚡ Source Code Explorer v2.0 ⚡');
       await sleep(100);
 
@@ -352,11 +348,11 @@ const JavaSourceViewer: React.FC = () => {
           break;
         }
         addLine('output', '');
-        addLine('highlight', `  ┌${'─'.repeat(70)}┐`);
+        addLine('highlight', `  ╭${'─'.repeat(70)}╮`);
         addLine('success', `  │  📄 ${file.name.padEnd(63)} │`);
         addLine('info', `  │     ${file.description.padEnd(61)} │`);
         addLine('dim', `  │     ${(file.path + file.name).padEnd(61)} │`);
-        addLine('highlight', `  └${'─'.repeat(70)}┘`);
+        addLine('highlight', `  ╰${'─'.repeat(70)}╯`);
         addLine('output', '');
         addLine('code', file.code);
         addLine('output', '');
@@ -446,33 +442,33 @@ const JavaSourceViewer: React.FC = () => {
       case 'neofetch':
         addLine('output', '');
         await sleep(20);
-        addLine('ascii', '       ( (                        ┌─────────────────────────────────────┐');
+        addLine('ascii', '                                      ┌─────────────────────────────────────┐');
         await sleep(25);
-        addLine('ascii', '        ) )                       │  spring-boot-cms@2.0                │');
+        addLine('ascii', '         ( (                          │  spring-boot-cms@2.0                │');
         await sleep(25);
-        addLine('ascii', '      ........                    ├─────────────────────────────────────┤');
+        addLine('ascii', '          ) )                         ├─────────────────────────────────────┤');
         await sleep(25);
-        addLine('success', '      |      |]                   │                                     │');
+        addLine('success', '        ........                      │                                     │');
         await sleep(25);
-        addLine('success', '      \\\\      /                    │  OS         Spring Boot 3.2.x       │');
+        addLine('success', '        |      |]                     │  OS         Spring Boot 3.2.x       │');
         await sleep(25);
-        addLine('success', "       \`----'                     │  Runtime    Java 17+ (LTS)          │");
+        addLine('success', '        \\\\      /                      │  Runtime    Java 17+ (LTS)          │');
         await sleep(25);
-        addLine('ascii', '                                   │  Auth       JWT + BCrypt            │');
+        addLine('success', "         \`----'                       │  Auth       JWT + BCrypt            │");
         await sleep(25);
-        addLine('ascii', '     ██╗ █████╗ ██╗   ██╗ █████╗   │  Database   JPA / Hibernate         │');
+        addLine('ascii', '                                      │  Database   JPA / Hibernate         │');
         await sleep(25);
-        addLine('ascii', '     ██║██╔══██╗██║   ██║██╔══██╗  │  Packages   17 source files         │');
+        addLine('ascii', '       ██╗ █████╗ ██╗   ██╗ █████╗    │  Packages   17 source files         │');
         await sleep(25);
-        addLine('ascii', '     ██║███████║██║   ██║███████║  │  AI         Sentiment Analysis      │');
+        addLine('ascii', '       ██║██╔══██╗██║   ██║██╔══██╗   │  AI         Sentiment Analysis      │');
         await sleep(25);
-        addLine('ascii', '██   ██║██╔══██║╚██╗ ██╔╝██╔══██║  │  SLA        Auto-escalation         │');
+        addLine('ascii', '       ██║███████║██║   ██║███████║   │  SLA        Auto-escalation         │');
         await sleep(25);
-        addLine('ascii', '╚█████╔╝██║  ██║ ╚████╔╝ ██║  ██║  │  Features   Gamification, QR        │');
+        addLine('ascii', '  ██   ██║██╔══██║╚██╗ ██╔╝██╔══██║   │  Features   Gamification, QR        │');
         await sleep(25);
-        addLine('ascii', ' ╚════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝  │                                     │');
+        addLine('ascii', '  ╚█████╔╝██║  ██║ ╚████╔╝ ██║  ██║   │                                     │');
         await sleep(25);
-        addLine('output', '                                   └─────────────────────────────────────┘');
+        addLine('ascii', '   ╚════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝   └─────────────────────────────────────┘');
         await sleep(20);
         addLine('output', '');
         break;
@@ -540,138 +536,131 @@ const JavaSourceViewer: React.FC = () => {
 
   const getLineStyle = (type: TerminalLine['type']) => {
     switch (type) {
-      case 'input': return 'text-cyan-400';
+      case 'input': return 'text-cyan-400 font-bold';
       case 'error': return 'text-red-400';
       case 'success': return 'text-emerald-400';
       case 'info': return 'text-slate-400';
       case 'dim': return 'text-slate-600';
       case 'code': return '';
       case 'ascii': return 'text-cyan-400';
-      case 'highlight': return 'text-purple-400';
+      case 'highlight': return 'text-purple-400 font-bold';
       default: return 'text-slate-300';
     }
   };
 
   return (
-    <div className="min-h-[calc(100vh-200px)] flex flex-col">
-      {/* Terminal */}
-      <div
-        className="flex-1 bg-[#0d1117] rounded-2xl overflow-hidden border border-slate-700/50 shadow-2xl"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-slate-700/50">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-            <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-            <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
+    <div className="h-[calc(100vh-200px)] flex flex-col p-4">
+      {/* Background Glow */}
+      <div className="absolute top-20 right-20 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Terminal Container */}
+      <div className="relative flex-1 rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_80px_rgba(0,0,0,0.4)] bg-[#0d1117]/90 backdrop-blur-xl flex flex-col transition-all duration-300 hover:shadow-[0_0_100px_rgba(0,0,0,0.5)] hover:border-white/20 ring-1 ring-white/5">
+
+        {/* Glass Header */}
+        <div className="flex items-center justify-between px-5 py-4 bg-white/5 border-b border-white/5 backdrop-blur-md sticky top-0 z-10">
+          <div className="flex items-center space-x-2.5 group">
+            <div className="w-3.5 h-3.5 rounded-full bg-[#ff5f56] shadow-sm transform group-hover:scale-110 transition-transform cursor-pointer" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#ffbd2e] shadow-sm transform group-hover:scale-110 transition-transform delay-75 cursor-pointer" />
+            <div className="w-3.5 h-3.5 rounded-full bg-[#27c93f] shadow-sm transform group-hover:scale-110 transition-transform delay-150 cursor-pointer" />
           </div>
-          <span className="text-sm text-slate-400 font-mono">cms-backend — bash</span>
-          <div className="w-16" />
+          <div className="flex items-center gap-2 opacity-50">
+            <Terminal size={14} className="text-slate-400" />
+            <span className="text-sm text-slate-300 font-mono font-medium tracking-wide">admin@cms-backend: ~</span>
+          </div>
+          <div className="w-16 flex justify-end gap-2 opacity-30 hover:opacity-100 transition-opacity">
+            <Minimize2 size={16} className="cursor-pointer" />
+            <Maximize2 size={16} className="cursor-pointer" />
+          </div>
         </div>
 
-        {/* Body */}
+        {/* Terminal Body */}
         <div
           ref={terminalRef}
-          className="p-4 h-[calc(100vh-320px)] min-h-[450px] overflow-y-auto font-mono text-sm leading-relaxed"
+          className="p-6 flex-1 overflow-y-auto font-mono text-sm leading-relaxed scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"
           onClick={() => inputRef.current?.focus()}
         >
           {lines.map((line, idx) => (
             <div
               key={idx}
-              className={`${getLineStyle(line.type)} ${line.type === 'code'
-                ? 'my-3 bg-[#161b22] border border-slate-700/30 rounded-lg overflow-hidden'
-                : ''
-                }`}
+              className={`${getLineStyle(line.type)} ${line.type === 'code' ? 'my-4' : 'my-1'}`}
             >
               {line.type === 'code' ? (
-                <div className="overflow-x-auto animate-fadeIn">
-                  <div className="bg-[#21262d] px-4 py-2 border-b border-slate-700/30 text-xs text-slate-500 flex items-center gap-2">
-                    <span className="text-cyan-400 animate-pulse">●</span> Source Code
-                    <span className="ml-auto text-slate-600">Loading...</span>
-                  </div>
-                  <div className="p-4 text-[13px] leading-relaxed">
-                    {highlightJavaCode(line.content).map((lineEl, lineIdx) => (
-                      <div
-                        key={lineIdx}
-                        className="animate-slideIn opacity-0"
-                        style={{
-                          animationDelay: `${lineIdx * 15}ms`,
-                          animationFillMode: 'forwards'
-                        }}
-                      >
-                        {lineEl}
-                      </div>
-                    ))}
+                <div className="relative group/code">
+                  <div className="absolute inset-0 bg-white/5 rounded-xl -m-1 blur opacity-0 group-hover/code:opacity-100 transition-opacity" />
+                  <div className="relative bg-[#0d1117]/80 border border-white/10 rounded-xl overflow-hidden shadow-2xl">
+                    <div className="bg-white/5 px-4 py-2 border-b border-white/5 text-xs text-slate-400 flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+                      Java Source
+                      <span className="ml-auto opacity-50 font-mono">UTF-8</span>
+                    </div>
+                    <div className="p-5 text-[13px] leading-relaxed overflow-x-auto">
+                      {highlightJavaCode(line.content).map((lineEl, lineIdx) => (
+                        <div
+                          key={lineIdx}
+                          className="opacity-0 animate-slideIn"
+                          style={{
+                            animationDelay: `${lineIdx * 10}ms`,
+                            animationFillMode: 'forwards'
+                          }}
+                        >
+                          {lineEl}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : (
-                <span className="whitespace-pre">{line.content}</span>
+                <span className="whitespace-pre drop-shadow-sm">{line.content}</span>
               )}
             </div>
           ))}
 
-          {/* Prompt */}
+          {/* Input Line */}
           {isBooted && (
-            <form onSubmit={handleSubmit} className="flex items-center mt-1">
-              <span className="mr-2">
-                <span className="text-emerald-400">cms</span>
-                <span className="text-slate-500">:</span>
-                <span className="text-cyan-400">~/java{currentDir ? `/${currentDir}` : ''}</span>
-                <span className="text-slate-500">$</span>
+            <form onSubmit={handleSubmit} className="flex items-center mt-3 group">
+              <span className="mr-3 whitespace-nowrap">
+                <span className="text-emerald-400 font-bold drop-shadow-md">➜</span>
+                <span className="text-cyan-400 ml-2 font-bold drop-shadow-md">~{currentDir ? `/${currentDir}` : ''}</span>
               </span>
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="flex-1 bg-transparent text-slate-200 focus:outline-none caret-slate-200 placeholder-slate-700"
-                placeholder={isTyping ? '' : 'Type a command...'}
-                autoFocus
-                disabled={isTyping}
-                spellCheck={false}
-              />
-              {isTyping && <span className="text-slate-500 animate-pulse">▋</span>}
+              <div className="relative flex-1">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  className="w-full bg-transparent text-slate-100 focus:outline-none caret-emerald-400 placeholder-white/20 font-medium"
+                  placeholder={isTyping ? '' : 'Type command...'}
+                  autoFocus
+                  disabled={isTyping}
+                  spellCheck={false}
+                />
+                {isTyping && <span className="absolute left-0 text-emerald-400 animate-pulse">▋</span>}
+              </div>
             </form>
           )}
         </div>
       </div>
 
-      {/* Quick buttons */}
-      <div className="mt-4 flex flex-wrap gap-2">
-        {['help', 'ls', 'tree', 'cat sla', 'cat jwt', 'cat auth', 'neofetch', 'clear'].map(cmd => (
+      {/* Quick Actions Bar - Floating Glass */}
+      <div className="mt-6 flex flex-wrap gap-3 justify-center">
+        {['help', 'ls', 'tree', 'cat sla', 'neofetch', 'clear'].map(cmd => (
           <button
             key={cmd}
             onClick={() => !isTyping && isBooted && processCommand(cmd)}
-            className="px-3 py-1.5 text-xs font-mono bg-[#21262d] text-slate-400 rounded-lg border border-slate-700/50 hover:bg-[#30363d] hover:text-slate-200 transition-all"
+            className="px-4 py-2 text-xs font-mono font-medium text-slate-300 bg-white/5 hover:bg-white/10 active:bg-white/20 backdrop-blur-md rounded-full border border-white/10 transition-all hover:scale-105 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)] flex items-center gap-2 group"
           >
-            $ {cmd}
+            <Play size={10} className="fill-current opacity-50 group-hover:opacity-100 transition-opacity" />
+            {cmd}
           </button>
         ))}
       </div>
 
-      {/* CSS Animations */}
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideIn {
-          from { 
-            opacity: 0; 
-            transform: translateX(-10px);
-          }
-          to { 
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-        .animate-slideIn {
-          animation: slideIn 0.2s ease-out forwards;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+        .animate-slideIn { animation: slideIn 0.2s ease-out forwards; }
       `}</style>
     </div>
   );
