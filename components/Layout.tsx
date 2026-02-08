@@ -30,9 +30,10 @@ const Layout: React.FC<LayoutProps> = ({
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: [UserRole.ADMIN, UserRole.STAFF] },
     { id: 'complaints', label: 'All Complaints', icon: List, roles: [UserRole.ADMIN, UserRole.STAFF] },
-    { id: 'my-complaints', label: 'My Complaints', icon: List, roles: [UserRole.STUDENT] },
+    { id: 'my-complaints', label: 'My Complaints', icon: List, roles: [UserRole.CUSTOMER] },
+    { id: 'create-complaint', label: 'New Complaint', icon: FileText, roles: [UserRole.CUSTOMER] },
     { id: 'reports', label: 'Analytics & Reports', icon: FileText, roles: [UserRole.ADMIN] },
-    { id: 'java-source', label: 'Backend Source', icon: Code, roles: [UserRole.ADMIN] },
+    { id: 'java-source', label: 'Backend Source', icon: Code, roles: [UserRole.ADMIN, UserRole.STAFF] },
   ];
 
   const handleLogoutClick = () => {
@@ -51,7 +52,7 @@ const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className={`flex h-screen overflow-hidden font-sans ${isDarkMode ? 'bg-slate-900 text-white' : 'bg-gray-50 text-slate-800'}`}>
+    <div className={`flex h-screen overflow-hidden font-sans ${isDarkMode ? 'dark bg-slate-900 text-white' : 'bg-gray-50 text-slate-800'}`}>
       {/* Sidebar */}
       <aside
         className={`${isSidebarOpen ? 'w-72' : 'w-20'} bg-slate-900 text-white flex flex-col shadow-2xl transition-all duration-300 z-50 flex-shrink-0 relative border-r border-slate-800`}
