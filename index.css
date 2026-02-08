@@ -9,10 +9,12 @@
 }
 
 @layer components {
+
+  /* Glassmorphism Utilities */
   .glass {
     @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl;
   }
-  
+
   .glass-card {
     @apply bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-white/20 dark:border-slate-700/50 shadow-lg rounded-2xl transition-all duration-300;
   }
@@ -21,31 +23,56 @@
     @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .input-field {
-    @apply w-full px-4 py-3 rounded-xl border bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all;
+  .input-glass {
+    @apply w-full px-4 py-3 rounded-xl border bg-white/5 dark:bg-slate-900/50 backdrop-blur-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30 px-6 py-2.5 rounded-xl font-bold transition-all hover:scale-105 active:scale-95;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors;
   }
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Animations */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
 }
 
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
+.animate-blob {
+  animation: blob 7s infinite;
 }
 
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full hover:bg-slate-400 dark:hover:bg-slate-600 transition-colors;
+.animation-delay-2000 {
+  animation-delay: 2s;
 }
 
-/* Utility for removing scrollbar but keeping functionality */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+.animation-delay-4000 {
+  animation-delay: 4s;
 }
