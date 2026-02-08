@@ -54,7 +54,7 @@ const DIRECTORY_STRUCTURE: Record<string, string[]> = {
   'security': ['SecurityConfig.java', 'JwtTokenProvider.java', 'JwtAuthenticationFilter.java'],
 };
 
-const highlightJavaCode = (code: string): React.ReactNode => {
+const highlightJavaCode = (code: string): React.ReactElement[] => {
   const lines = code.split('\n');
 
   return lines.map((line, lineNum) => {
@@ -192,29 +192,22 @@ const JavaSourceViewer: React.FC = () => {
       await sleep(50);
 
       // Simple readable ASCII banner
-      addLine('ascii', '  ╔═══════════════════════════════════════════════════════════════╗');
-      await sleep(30);
-      addLine('ascii', '  ║                                                               ║');
-      await sleep(30);
-      addLine('ascii', '  ║   ██████╗  █████╗   ██████╗  ██╗  ██╗  ███████╗  ███╗   ██╗   ║');
-      await sleep(30);
-      addLine('ascii', '  ║   ██╔══██╗ ██╔══██╗ ██╔════╝ ██║ ██╔╝  ██╔════╝  ████╗  ██║   ║');
-      await sleep(30);
-      addLine('ascii', '  ║   ██████╔╝ ███████║ ██║      █████╔╝   █████╗    ██╔██╗ ██║   ║');
-      await sleep(30);
-      addLine('ascii', '  ║   ██╔══██╗ ██╔══██║ ██║      ██╔═██╗   ██╔══╝    ██║╚██╗██║   ║');
-      await sleep(30);
-      addLine('ascii', '  ║   ██████╔╝ ██║  ██║ ╚██████╗ ██║  ██╗  ███████╗  ██║ ╚████║   ║');
-      await sleep(30);
-      addLine('ascii', '  ║   ╚═════╝  ╚═╝  ╚═╝  ╚═════╝ ╚═╝  ╚═╝  ╚══════╝  ╚═╝  ╚═══╝   ║');
-      await sleep(30);
-      addLine('ascii', '  ║                                                               ║');
-      await sleep(30);
-      addLine('highlight', '  ║   ⚡ CMS Backend - Source Code Explorer                       ║');
-      await sleep(30);
-      addLine('ascii', '  ║                                                               ║');
-      await sleep(30);
-      addLine('ascii', '  ╚═══════════════════════════════════════════════════════════════╝');
+      addLine('ascii', '');
+      addLine('ascii', '    ██████╗ ███╗   ███╗ ███████╗    ██████╗  █████╗  ██████╗██╗  ██╗███████╗███╗   ██╗██████╗ ');
+      await sleep(25);
+      addLine('ascii', '   ██╔════╝ ████╗ ████║ ██╔════╝    ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔════╝████╗  ██║██╔══██╗');
+      await sleep(25);
+      addLine('ascii', '   ██║      ██╔████╔██║ ███████╗    ██████╔╝███████║██║     █████╔╝ █████╗  ██╔██╗ ██║██║  ██║');
+      await sleep(25);
+      addLine('ascii', '   ██║      ██║╚██╔╝██║ ╚════██║    ██╔══██╗██╔══██║██║     ██╔═██╗ ██╔══╝  ██║╚██╗██║██║  ██║');
+      await sleep(25);
+      addLine('ascii', '   ╚██████╗ ██║ ╚═╝ ██║ ███████║    ██████╔╝██║  ██║╚██████╗██║  ██╗███████╗██║ ╚████║██████╔╝');
+      await sleep(25);
+      addLine('ascii', '    ╚═════╝ ╚═╝     ╚═╝ ╚══════╝    ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝╚═════╝ ');
+      await sleep(25);
+      addLine('ascii', '');
+      await sleep(50);
+      addLine('highlight', '                        ⚡ Source Code Explorer v2.0 ⚡');
       await sleep(100);
 
       addLine('output', '');
@@ -452,14 +445,38 @@ const JavaSourceViewer: React.FC = () => {
 
       case 'neofetch':
         addLine('output', '');
-        addLine('ascii', '       .---.                 cms-backend@2.0');
-        addLine('ascii', '      /     \\                ─────────────────');
-        addLine('ascii', '      \\.@-@./                OS: Spring Boot 3.2');
-        addLine('ascii', '      /`\\_/`\\                Kernel: JVM 17+ LTS');
-        addLine('ascii', '     //  _  \\\\               Shell: cms-terminal');
-        addLine('ascii', '    | \\     )|_              Packages: 17 (java)');
-        addLine('ascii', '   /`\\_`>  <_/ \\             Auth: JWT + BCrypt');
-        addLine('ascii', '   \\__/\'---\'\\__/             DB: JPA/Hibernate');
+        addLine('output', '');
+        await sleep(30);
+        addLine('ascii', '             .   .                    ┌──────────────────────────────────────────┐');
+        await sleep(30);
+        addLine('ascii', '            .:...::                   │  cms-backend@2.0                        │');
+        await sleep(30);
+        addLine('ascii', '           .:::::::.                  ├──────────────────────────────────────────┤');
+        await sleep(30);
+        addLine('success', '          .::::::::::.                │  🖥️  OS         Spring Boot 3.2.x        │');
+        await sleep(30);
+        addLine('success', '   .::.   ::::::::::::.   .::.        │  ☕ Runtime    Java 17+ (LTS)            │');
+        await sleep(30);
+        addLine('success', '   ::::.  ::::::::::::  .::::         │  🔐 Auth       JWT + BCrypt              │');
+        await sleep(30);
+        addLine('success', '   :::::. :::::::::::: .:::::         │  💾 Database   JPA / Hibernate           │');
+        await sleep(30);
+        addLine('success', '    ::::::.::::    ::::.:::::         │  📦 Packages   17 source files           │');
+        await sleep(30);
+        addLine('ascii', '    ::::::::::      ::::::::::        │  🧠 AI         Sentiment Analysis        │');
+        await sleep(30);
+        addLine('ascii', '     ::::::::        ::::::::         │  ⏰ SLA        Auto-escalation           │');
+        await sleep(30);
+        addLine('ascii', '      .:::::          ::::::.         │  🎮 Features   Gamification System       │');
+        await sleep(30);
+        addLine('ascii', '        :::            :::.           │  📱 QR         Tracking Codes            │');
+        await sleep(30);
+        addLine('output', '                                      └──────────────────────────────────────────┘');
+        await sleep(30);
+        addLine('output', '');
+        addLine('output', '        ┌────────────────────────────────────────────────────────────────────┐');
+        addLine('highlight', '        │  🟥 🟧 🟨 🟩 🟦 🟪 ⬛ ⬜    Spring Boot Complaint Management System   │');
+        addLine('output', '        └────────────────────────────────────────────────────────────────────┘');
         addLine('output', '');
         break;
 
@@ -570,12 +587,24 @@ const JavaSourceViewer: React.FC = () => {
                 }`}
             >
               {line.type === 'code' ? (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto animate-fadeIn">
                   <div className="bg-[#21262d] px-4 py-2 border-b border-slate-700/30 text-xs text-slate-500 flex items-center gap-2">
-                    <span className="text-cyan-400">●</span> Source Code
+                    <span className="text-cyan-400 animate-pulse">●</span> Source Code
+                    <span className="ml-auto text-slate-600">Loading...</span>
                   </div>
                   <div className="p-4 text-[13px] leading-relaxed">
-                    {highlightJavaCode(line.content)}
+                    {highlightJavaCode(line.content).map((lineEl, lineIdx) => (
+                      <div
+                        key={lineIdx}
+                        className="animate-slideIn opacity-0"
+                        style={{
+                          animationDelay: `${lineIdx * 15}ms`,
+                          animationFillMode: 'forwards'
+                        }}
+                      >
+                        {lineEl}
+                      </div>
+                    ))}
                   </div>
                 </div>
               ) : (
@@ -623,6 +652,30 @@ const JavaSourceViewer: React.FC = () => {
           </button>
         ))}
       </div>
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes slideIn {
+          from { 
+            opacity: 0; 
+            transform: translateX(-10px);
+          }
+          to { 
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+        .animate-slideIn {
+          animation: slideIn 0.2s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 };
