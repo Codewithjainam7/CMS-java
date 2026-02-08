@@ -37,15 +37,14 @@ const ComplaintList: React.FC<ComplaintListProps> = ({ complaints, onSelect, isA
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginatedComplaints = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  const cardClass = isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800';
-  const inputClass = isDarkMode ? 'bg-slate-700 border-slate-600 text-white' : 'bg-slate-50 border-slate-200 text-slate-700';
+  const inputClass = isDarkMode ? 'bg-slate-700/50 border-slate-600/50 text-white placeholder-slate-400' : 'bg-white/50 border-white/20 text-slate-700 placeholder-slate-500';
 
   const getPriorityStyles = (p: Priority) => {
     switch (p) {
-      case Priority.CRITICAL: return 'bg-red-50 text-red-700 border-red-200';
-      case Priority.HIGH: return 'bg-orange-50 text-orange-700 border-orange-200';
-      case Priority.MEDIUM: return 'bg-blue-50 text-blue-700 border-blue-200';
-      default: return 'bg-slate-50 text-slate-700 border-slate-200';
+      case Priority.CRITICAL: return 'bg-red-500/10 text-red-500 border-red-500/20';
+      case Priority.HIGH: return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+      case Priority.MEDIUM: return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+      default: return 'bg-slate-500/10 text-slate-500 border-slate-500/20';
     }
   };
 
@@ -71,19 +70,19 @@ const ComplaintList: React.FC<ComplaintListProps> = ({ complaints, onSelect, isA
   return (
     <div className="relative">
       {/* Controls */}
-      <div className={`flex flex-col xl:flex-row justify-between gap-4 p-4 rounded-2xl shadow-sm border sticky top-0 z-10 backdrop-blur-xl mb-6 ${isDarkMode ? 'bg-slate-800/90 border-slate-700' : 'bg-white/90 border-slate-200/60'}`}>
+      <div className={`flex flex-col xl:flex-row justify-between gap-4 p-4 rounded-[24px] shadow-lg border sticky top-4 z-30 backdrop-blur-xl mb-8 glass-panel border-white/10`}>
         <div className="relative flex-1 group">
-          <Search className="absolute left-3 top-3 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+          <Search className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
           <input
             type="text"
             placeholder="Search by ID or Subject..."
-            className={`w-full pl-10 pr-4 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm ${inputClass}`}
+            className={`w-full pl-12 pr-4 py-3 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm ${inputClass}`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className={`flex items-center border rounded-xl px-3 py-2 ${inputClass}`}>
+          <div className={`flex items-center border rounded-2xl px-4 py-3 ${inputClass}`}>
             <Filter size={16} className="text-slate-400 mr-2" />
             <select
               className="bg-transparent text-sm focus:outline-none cursor-pointer"
@@ -96,7 +95,7 @@ const ComplaintList: React.FC<ComplaintListProps> = ({ complaints, onSelect, isA
           </div>
 
           {isAdmin && (
-            <div className={`flex items-center border rounded-xl px-3 py-2 ${inputClass}`}>
+            <div className={`flex items-center border rounded-2xl px-4 py-3 ${inputClass}`}>
               <User size={16} className="text-slate-400 mr-2" />
               <select
                 className="bg-transparent text-sm focus:outline-none cursor-pointer max-w-[150px]"
@@ -117,7 +116,7 @@ const ComplaintList: React.FC<ComplaintListProps> = ({ complaints, onSelect, isA
           <div
             key={complaint.id}
             onClick={() => onSelect(complaint.id)}
-            className={`group p-0 rounded-2xl shadow-sm border hover:shadow-lg transition-all duration-200 cursor-pointer relative overflow-hidden ${cardClass} ${isDarkMode ? 'hover:border-blue-500' : 'hover:border-blue-300'}`}
+            className={`glass-card group p-0 hover:shadow-2xl transition-all duration-300 cursor-pointer relative overflow-hidden border border-white/10 hover:-translate-y-1 hover:border-blue-500/30`}
           >
             {/* Left Status Stripe */}
             <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${getStatusColor(complaint.status)}`}></div>
@@ -125,7 +124,7 @@ const ComplaintList: React.FC<ComplaintListProps> = ({ complaints, onSelect, isA
             <div className="p-6 pl-8">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                  <span className={`font-mono text-xs font-bold px-2 py-1 rounded-md border ${isDarkMode ? 'bg-slate-700 text-slate-300 border-slate-600' : 'bg-slate-100 text-slate-500 border-slate-200'}`}>{complaint.id}</span>
+                  <span className={`font-mono text-xs font-bold px-2 py-1 rounded-lg border ${isDarkMode ? 'bg-slate-800/50 text-slate-300 border-slate-700' : 'bg-slate-100/50 text-slate-500 border-slate-200'}`}>{complaint.id}</span>
                   <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-full border ring-1 ring-inset ${getPriorityStyles(complaint.priority)}`}>
                     {complaint.priority}
                   </span>
@@ -137,13 +136,13 @@ const ComplaintList: React.FC<ComplaintListProps> = ({ complaints, onSelect, isA
               </div>
 
               <div className="flex justify-between items-center mb-2">
-                <h3 className={`text-lg font-bold group-hover:text-blue-500 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{complaint.title}</h3>
+                <h3 className={`text-xl font-bold group-hover:text-blue-500 transition-colors ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>{complaint.title}</h3>
                 <ArrowRight size={20} className="text-slate-400 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" />
               </div>
 
               <p className={`text-sm line-clamp-2 mb-5 leading-relaxed ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{complaint.description}</p>
 
-              <div className={`flex items-center justify-between pt-4 border-t ${isDarkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+              <div className={`flex items-center justify-between pt-4 border-t ${isDarkMode ? 'border-white/5' : 'border-slate-200/50'}`}>
                 <div className="flex items-center gap-6">
                   <div className="flex items-center text-xs text-slate-500">
                     <span className="w-2 h-2 rounded-full bg-slate-300 mr-2"></span>

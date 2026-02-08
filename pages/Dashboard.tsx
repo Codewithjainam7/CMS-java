@@ -13,24 +13,21 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ user, complaints, isDarkMode }) => {
   // --- Styling Variables ---
-  const cardClass = isDarkMode
-    ? 'bg-gradient-to-br from-slate-800/80 to-slate-900/80 border-slate-700/50 backdrop-blur-sm'
-    : 'bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 backdrop-blur-sm';
-  const textPrimary = isDarkMode ? 'text-white' : 'text-slate-800';
+  const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
   const textSecondary = isDarkMode ? 'text-slate-400' : 'text-slate-500';
 
   // Premium container wrapper with glow effect
   const PremiumCard = ({ children, className = '', glowColor = 'blue' }: any) => {
     const glowColors: Record<string, string> = {
-      blue: isDarkMode ? 'hover:shadow-blue-500/5' : 'hover:shadow-blue-500/10',
-      red: isDarkMode ? 'hover:shadow-red-500/5' : 'hover:shadow-red-500/10',
-      green: isDarkMode ? 'hover:shadow-green-500/5' : 'hover:shadow-green-500/10',
-      purple: isDarkMode ? 'hover:shadow-purple-500/5' : 'hover:shadow-purple-500/10',
+      blue: 'hover:shadow-blue-500/20',
+      red: 'hover:shadow-red-500/20',
+      green: 'hover:shadow-emerald-500/20',
+      purple: 'hover:shadow-purple-500/20',
     };
     return (
       <div className={`
-        relative overflow-hidden rounded-3xl p-6 shadow-xl border transition-all duration-300
-        ${cardClass} ${glowColors[glowColor]} hover:shadow-2xl hover:-translate-y-1
+        glass-card relative overflow-hidden p-6 hover:-translate-y-1
+        ${glowColors[glowColor]} 
         before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:to-transparent before:pointer-events-none
         ${className}
       `}>
@@ -114,26 +111,26 @@ const Dashboard: React.FC<DashboardProps> = ({ user, complaints, isDarkMode }) =
   // --- Render Functions ---
 
   const StatCard = ({ title, value, icon: Icon, gradient, trend, subtext }: any) => (
-    <div className={`relative overflow-hidden rounded-3xl p-6 shadow-xl text-white ${gradient} transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl group`}>
+    <div className={`relative overflow-hidden rounded-[32px] p-6 shadow-xl text-white ${gradient} transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl group border border-white/10`}>
       {/* Decorative elements */}
-      <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+      <div className="absolute -right-4 -top-4 w-32 h-32 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-500" />
       <div className="absolute right-0 bottom-0 opacity-10 transform translate-x-4 translate-y-4">
-        <Icon size={100} strokeWidth={1} />
+        <Icon size={120} strokeWidth={1} />
       </div>
       <div className="relative z-10">
         <div className="flex items-center justify-between mb-4">
-          <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm shadow-inner">
-            <Icon size={22} className="text-white" />
+          <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md shadow-inner border border-white/20">
+            <Icon size={24} className="text-white" />
           </div>
           {trend && (
-            <span className="text-xs font-bold bg-white/25 px-3 py-1.5 rounded-xl flex items-center backdrop-blur-sm">
+            <span className="text-xs font-bold bg-white/20 px-3 py-1.5 rounded-xl flex items-center backdrop-blur-sm border border-white/10 shadow-sm">
               <TrendingUp size={12} className="mr-1" /> {trend}
             </span>
           )}
         </div>
         <p className="text-sm font-medium opacity-90 tracking-wide">{title}</p>
-        <h3 className="text-4xl font-extrabold mt-1 tracking-tight">{value}</h3>
-        {subtext && <p className="text-xs mt-3 opacity-75 flex items-center"><Sparkles size={12} className="mr-1" /> {subtext}</p>}
+        <h3 className="text-4xl font-extrabold mt-1 tracking-tight drop-shadow-sm">{value}</h3>
+        {subtext && <p className="text-xs mt-3 opacity-75 flex items-center bg-black/10 w-fit px-2 py-1 rounded-lg backdrop-blur-sm"><Sparkles size={12} className="mr-1" /> {subtext}</p>}
       </div>
     </div>
   );
@@ -179,14 +176,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, complaints, isDarkMode }) =
           <div className="flex justify-between items-center mb-6">
             <div>
               <h3 className={`text-lg font-bold flex items-center ${textPrimary}`}>
-                <div className="p-2 rounded-xl bg-red-500/10 mr-3">
+                <div className="p-2 rounded-xl bg-red-500/10 mr-3 border border-red-500/20">
                   <AlertCircle size={20} className="text-red-500" />
                 </div>
                 SLA Breach Trend
               </h3>
               <p className={`text-sm mt-1 ${textSecondary}`}>Missed deadlines over last 15 days</p>
             </div>
-            <div className={`px-3 py-1.5 rounded-xl text-xs font-bold ${isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-50 text-red-600'}`}>
+            <div className={`px-3 py-1.5 rounded-xl text-xs font-bold ${isDarkMode ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-red-50 text-red-600 border border-red-100'}`}>
               Live Data
             </div>
           </div>
@@ -199,7 +196,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, complaints, isDarkMode }) =
                     <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#334155' : '#e2e8f0'} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} />
                 <XAxis
                   dataKey="day"
                   axisLine={false}
@@ -216,13 +213,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, complaints, isDarkMode }) =
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: isDarkMode ? '#1e293b' : '#fff',
+                    backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(12px)',
                     borderRadius: '16px',
-                    border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
-                    padding: '12px 16px'
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
+                    padding: '12px 16px',
+                    color: isDarkMode ? '#fff' : '#000'
                   }}
-                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                  itemStyle={{ color: isDarkMode ? '#fff' : '#000' }}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px', color: isDarkMode ? '#fff' : '#000' }}
                   cursor={{ stroke: '#ef4444', strokeWidth: 2, strokeDasharray: '4 4' }}
                 />
                 <Area
@@ -268,11 +268,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user, complaints, isDarkMode }) =
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: isDarkMode ? '#1e293b' : '#fff',
+                    backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(12px)',
                     borderRadius: '12px',
-                    border: 'none',
-                    boxShadow: '0 10px 40px rgba(0,0,0,0.15)'
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
                   }}
+                  itemStyle={{ color: isDarkMode ? '#fff' : '#000' }}
                 />
               </PieChart>
             </ResponsiveContainer>
