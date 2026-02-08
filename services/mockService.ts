@@ -25,11 +25,11 @@ const generateUser = (id: string, role: UserRole, index: number): User => {
 export const MOCK_USERS: User[] = [
   { id: '1', name: 'Admin Administrator', email: 'admin@cms.com', role: UserRole.ADMIN, avatar: 'https://i.pravatar.cc/150?u=1' },
   { id: '2', name: 'Sarah Staff', email: 'sarah.staff@cms.com', role: UserRole.STAFF, avatar: 'https://i.pravatar.cc/150?u=2', points: 3420, badges: ['⭐ Customer Champion'] },
-  { id: '3', name: 'John Doe', email: 'john.doe@gmail.com', role: UserRole.CUSTOMER, avatar: 'https://i.pravatar.cc/150?u=3' },
+  { id: '3', name: 'Alex Student', email: 'student@university.edu', role: UserRole.STUDENT, avatar: 'https://i.pravatar.cc/150?u=3' },
   // Generate more staff
   ...Array.from({ length: 12 }).map((_, i) => generateUser(`${i + 10}`, UserRole.STAFF, i)),
-  // Generate more customers
-  ...Array.from({ length: 10 }).map((_, i) => generateUser(`${i + 30}`, UserRole.CUSTOMER, i + 5)),
+  // Generate more students
+  ...Array.from({ length: 10 }).map((_, i) => generateUser(`${i + 30}`, UserRole.STUDENT, i + 5)),
 ];
 
 // --- MOCK COMPLAINTS GENERATION ---
@@ -83,7 +83,7 @@ export const MOCK_COMPLAINTS: Complaint[] = Array.from({ length: 120 }).map((_, 
   else if (rand > 0.4) status = ComplaintStatus.ASSIGNED;
   else if (rand > 0.3) status = ComplaintStatus.CLOSED;
 
-  const customer = getRandomItem(MOCK_USERS.filter(u => u.role === UserRole.CUSTOMER));
+  const customer = getRandomItem(MOCK_USERS.filter(u => u.role === UserRole.STUDENT));
   const staff = status !== ComplaintStatus.NEW ? getRandomItem(MOCK_USERS.filter(u => u.role === UserRole.STAFF)) : undefined;
 
   const createdDate = new Date(now.getTime() - Math.random() * 30 * oneDay); // Last 30 days

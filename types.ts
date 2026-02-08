@@ -1,7 +1,7 @@
 export enum UserRole {
   ADMIN = 'ADMIN',
   STAFF = 'STAFF',
-  CUSTOMER = 'CUSTOMER'
+  STUDENT = 'STUDENT'
 }
 
 export enum ComplaintStatus {
