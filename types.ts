@@ -50,6 +50,11 @@ export interface Complaint {
   customerId: string;
   assignedTo?: string; // Staff ID
   customerName: string;
+  studentId?: string;
+  department?: string;
+  contactNumber?: string;
+  incidentDate?: string;
+  incidentLocation?: string;
 }
 
 export interface Comment {

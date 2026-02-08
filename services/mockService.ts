@@ -65,6 +65,9 @@ const getSentimentForDesc = (desc: string): Sentiment => {
   return Sentiment.NEUTRAL;
 };
 
+const departments = ['Computer Science', 'Mechanical', 'Civil', 'Electrical', 'Electronics', 'Information Tech', 'Chemical', 'Biotech'];
+const locations = ['Main Building', 'Library', 'Canteen', 'Hostel A', 'Hostel B', 'Sports Complex', 'Lab 1', 'Lab 2', 'Parking Lot', 'Auditorium'];
+
 // Generate 120 complaints
 export const MOCK_COMPLAINTS: Complaint[] = Array.from({ length: 120 }).map((_, i) => {
   const priority = getRandomItem(Object.values(Priority));
@@ -94,6 +97,13 @@ export const MOCK_COMPLAINTS: Complaint[] = Array.from({ length: 120 }).map((_, 
 
   const slaDeadline = new Date(createdDate.getTime() + slaTime).toISOString();
 
+  // New Mock Data Fields
+  const studentId = `2024${(i + 1).toString().padStart(4, '0')}`;
+  const department = getRandomItem(departments);
+  const incidentLocation = getRandomItem(locations);
+  const contactNumber = `98${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+  const incidentDate = getRandomDate(new Date(createdDate.getTime() - 5 * oneDay), createdDate);
+
   return {
     id: `CMP-2024-${(i + 1).toString().padStart(5, '0')}`,
     title: `${category} Issue - ${i + 1}`,
@@ -107,7 +117,12 @@ export const MOCK_COMPLAINTS: Complaint[] = Array.from({ length: 120 }).map((_, 
     slaDeadline,
     customerId: customer.id,
     customerName: customer.name,
-    assignedTo: staff?.id
+    assignedTo: staff?.id,
+    studentId,
+    department,
+    incidentLocation,
+    contactNumber,
+    incidentDate
   };
 });
 
@@ -129,19 +144,28 @@ export const analyzeSentiment = (text: string): Sentiment => {
 export const suggestCategory = (text: string): string => {
   const lower = text.toLowerCase();
 
-  // Billing Issues
-  if (lower.includes('bill') || lower.includes('refund') || lower.includes('charge') || lower.includes('payment') || lower.includes('invoice') || lower.includes('cost') || lower.includes('subscription')) return 'Billing';
+  // Sexual Harassment / Safety
+  if (lower.includes('sexual') || lower.includes('harassment') || lower.includes('touch') || lower.includes('inappropriate') || lower.includes('unsafe') || lower.includes('abuse') || lower.includes('molest')) return 'Sexual Harassment';
 
-  // Technical Issues
-  if (lower.includes('internet') || lower.includes('connect') || lower.includes('error') || lower.includes('bug') || lower.includes('load') || lower.includes('crash') || lower.includes('500') || lower.includes('slow') || lower.includes('login') || lower.includes('down')) return 'Technical';
+  // Ragging
+  if (lower.includes('ragging') || lower.includes('bully') || lower.includes('senior') || lower.includes('force') || lower.includes('threat')) return 'Ragging';
 
-  // Service Issues
-  if (lower.includes('staff') || lower.includes('rude') || lower.includes('wait') || lower.includes('service') || lower.includes('response') || lower.includes('support') || lower.includes('agent') || lower.includes('harassment') || lower.includes('molest') || lower.includes('unsafe') || lower.includes('unprofessional')) return 'Service';
+  // Discrimination
+  if (lower.includes('caste') || lower.includes('religion') || lower.includes('gender') || lower.includes('discriminat') || lower.includes('bias')) return 'Discrimination';
 
-  // Product Issues
-  if (lower.includes('product') || lower.includes('feature') || lower.includes('broken') || lower.includes('damage') || lower.includes('quality') || lower.includes('item') || lower.includes('missing') || lower.includes('design')) return 'Product';
+  // Academic Issues
+  if (lower.includes('grade') || lower.includes('exam') || lower.includes('class') || lower.includes('faculty') || lower.includes('teacher') || lower.includes('attendance') || lower.includes('lecture') || lower.includes('syllabus')) return 'Academic Issues';
 
-  return ''; // Default to empty string so user is forced to select if unsure, or 'General' but 'General' might not be in the dropdown
+  // Infrastructure
+  if (lower.includes('fan') || lower.includes('light') || lower.includes('water') || lower.includes('wifi') || lower.includes('internet') || lower.includes('room') || lower.includes('hostel') || lower.includes('broken') || lower.includes('electricity')) return 'Infrastructure';
+
+  // Canteen / Hygiene
+  if (lower.includes('food') || lower.includes('mess') || lower.includes('canteen') || lower.includes('hygiene') || lower.includes('clean') || lower.includes('dirty') || lower.includes('washroom') || lower.includes('toilet') || lower.includes('water')) return 'Canteen/Hygiene';
+
+  // Student Affairs
+  if (lower.includes('election') || lower.includes('discipline') || lower.includes('event') || lower.includes('fee') || lower.includes('scholarship') || lower.includes('library')) return 'Student Affairs';
+
+  return 'Other';
 };
 
 export const calculateSLA = (priority: Priority): string => {

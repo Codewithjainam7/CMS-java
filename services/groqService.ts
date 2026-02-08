@@ -32,7 +32,7 @@ export const analyzeComplaintWithGroq = async (text: string): Promise<AIAnalysis
                         content: `You are an AI assistant for a Customer Complaint System. 
                         Analyze the user's complaint and extract:
                         1. Sentiment: strictly one of "ANGRY", "FRUSTRATED", "NEUTRAL", "SATISFIED".
-                        2. Category: strictly one of "Technical", "Billing", "Service", "Product".
+                        2. Category: strictly one of "Sexual Harassment", "Ragging", "Academic Issues", "Infrastructure", "Canteen/Hygiene", "Student Affairs", "Discrimination", "Other".
                         
                         Return ONLY a valid JSON object with keys "sentiment" and "category". Do not add any markdown formatting.`
                     },
