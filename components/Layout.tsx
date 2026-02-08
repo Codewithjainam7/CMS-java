@@ -28,7 +28,7 @@ const Layout: React.FC<LayoutProps> = ({
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: [UserRole.ADMIN, UserRole.STAFF, UserRole.STUDENT] },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: [UserRole.ADMIN, UserRole.STAFF] },
     { id: 'complaints', label: 'All Complaints', icon: List, roles: [UserRole.ADMIN, UserRole.STAFF] },
     { id: 'my-complaints', label: 'My Complaints', icon: List, roles: [UserRole.STUDENT] },
     { id: 'reports', label: 'Analytics & Reports', icon: FileText, roles: [UserRole.ADMIN] },
@@ -74,8 +74,8 @@ const Layout: React.FC<LayoutProps> = ({
               key={item.id}
               onClick={() => onNavigate(item.id)}
               className={`flex items-center space-x-3 w-full p-3.5 rounded-xl transition-all duration-200 group relative ${currentPage === item.id
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50'
-                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 }`}
             >
               <item.icon size={22} className={currentPage === item.id ? 'text-white' : 'text-slate-400 group-hover:text-white'} />
@@ -166,7 +166,7 @@ const Layout: React.FC<LayoutProps> = ({
                         <div key={n.id} className={`p-4 border-b transition-colors ${isDarkMode ? 'border-slate-700 hover:bg-slate-700' : 'border-gray-50 hover:bg-gray-50'} ${!n.read ? (isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50/30') : ''}`}>
                           <div className="flex justify-between items-start mb-1">
                             <span className={`text-xs font-bold px-2 py-0.5 rounded ${n.type === 'alert' ? 'bg-red-100 text-red-600' :
-                                n.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+                              n.type === 'success' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
                               }`}>
                               {n.type.toUpperCase()}
                             </span>

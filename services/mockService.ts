@@ -98,14 +98,14 @@ export const MOCK_COMPLAINTS: Complaint[] = Array.from({ length: 120 }).map((_, 
   const slaDeadline = new Date(createdDate.getTime() + slaTime).toISOString();
 
   // New Mock Data Fields
-  const studentId = `2024${(i + 1).toString().padStart(4, '0')}`;
+  const studentId = `2026${(i + 1).toString().padStart(4, '0')}`;
   const department = getRandomItem(departments);
   const incidentLocation = getRandomItem(locations);
   const contactNumber = `98${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
   const incidentDate = getRandomDate(new Date(createdDate.getTime() - 5 * oneDay), createdDate);
 
   return {
-    id: `CMP-2024-${(i + 1).toString().padStart(5, '0')}`,
+    id: `CMP-2026-${(i + 1).toString().padStart(5, '0')}`,
     title: `${category} Issue - ${i + 1}`,
     description: `${desc} (Ticket #${i + 1})`,
     category,

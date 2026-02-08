@@ -1,18 +1,77 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { User, UserRole } from '../types';
 import { MOCK_USERS } from '../services/mockService';
-import { Shield, Users, User as UserIcon, Lock, ArrowRight } from 'lucide-react';
+import { Shield, Users, User as UserIcon, Lock, ArrowRight, Mail, Key, AlertCircle } from 'lucide-react';
 
 interface LoginProps {
     onLogin: (user: User) => void;
 }
 
+type LoginTab = 'admin' | 'staff' | 'student';
+
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-    const handleRoleLogin = (role: UserRole) => {
-        const user = MOCK_USERS.find(u => u.role === role);
-        if (user) onLogin(user);
+    const [activeTab, setActiveTab] = useState<LoginTab>('admin');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const credentials = {
+        admin: { email: 'admin@cms.com', password: 'admin123', role: UserRole.ADMIN },
+        staff: { email: 'sarah.staff@cms.com', password: 'staff123', role: UserRole.STAFF },
+        student: { email: 'student@university.edu', password: 'student123', role: UserRole.STUDENT }
     };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setIsLoading(true);
+
+        setTimeout(() => {
+            const creds = credentials[activeTab];
+            if (email === creds.email && password === creds.password) {
+                const user = MOCK_USERS.find(u => u.role === creds.role);
+                if (user) {
+                    onLogin(user);
+                }
+            } else {
+                setError('Invalid email or password. Please try again.');
+            }
+            setIsLoading(false);
+        }, 800);
+    };
+
+    const fillCredentials = () => {
+        const creds = credentials[activeTab];
+        setEmail(creds.email);
+        setPassword(creds.password);
+        setError('');
+    };
+
+    const tabConfig = {
+        admin: {
+            icon: Shield,
+            label: 'Admin',
+            color: 'blue',
+            gradient: 'from-blue-600 to-blue-800'
+        },
+        staff: {
+            icon: Users,
+            label: 'Staff',
+            color: 'purple',
+            gradient: 'from-purple-600 to-purple-800'
+        },
+        student: {
+            icon: UserIcon,
+            label: 'Student / Victim',
+            color: 'emerald',
+            gradient: 'from-emerald-600 to-emerald-800'
+        }
+    };
+
+    const currentTab = tabConfig[activeTab];
+    const TabIcon = currentTab.icon;
 
     return (
         <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
@@ -20,87 +79,128 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
                 <div className="absolute top-10 left-10 w-72 h-72 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
                 <div className="absolute bottom-10 right-10 w-72 h-72 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+                <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-emerald-600 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-blob animation-delay-4000"></div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-lg border border-white/20 p-8 rounded-3xl shadow-2xl max-w-4xl w-full z-10 flex flex-col md:flex-row overflow-hidden">
+            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl max-w-md w-full z-10 overflow-hidden">
 
-                {/* Left Side - Brand */}
-                <div className="md:w-1/2 p-8 flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/10">
-                    <div className="flex items-center gap-3 mb-8">
-                        <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/30">
-                            <Shield className="text-white" size={24} />
+                {/* Header */}
+                <div className={`bg-gradient-to-r ${currentTab.gradient} p-8 text-center`}>
+                    <div className="flex items-center justify-center gap-3 mb-4">
+                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
+                            <TabIcon className="text-white" size={24} />
                         </div>
-                        <h1 className="text-3xl font-bold text-white tracking-tight">Enterprise CMS</h1>
                     </div>
-                    <p className="text-blue-200 mb-8 text-lg">
-                        Streamline your complaint resolution workflow with AI-driven insights and real-time tracking.
+                    <h1 className="text-2xl font-bold text-white tracking-tight mb-1">
+                        {currentTab.label} Portal
+                    </h1>
+                    <p className="text-white/70 text-sm">
+                        Complaint Management System
                     </p>
-                    <div className="space-y-4">
-                        <div className="flex items-center text-sm text-blue-100/80">
-                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mr-3"><Lock size={14} /></div>
-                            Enterprise Grade Security
-                        </div>
-                        <div className="flex items-center text-sm text-blue-100/80">
-                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center mr-3"><Users size={14} /></div>
-                            Multi-Role Architecture
-                        </div>
-                    </div>
                 </div>
 
-                {/* Right Side - Login Options */}
-                <div className="md:w-1/2 p-8 bg-white/5">
-                    <h2 className="text-2xl font-bold text-white mb-6">Select Role to Login</h2>
+                {/* Tabs */}
+                <div className="flex border-b border-white/10">
+                    {(['admin', 'staff', 'student'] as LoginTab[]).map((tab) => {
+                        const config = tabConfig[tab];
+                        const Icon = config.icon;
+                        return (
+                            <button
+                                key={tab}
+                                onClick={() => { setActiveTab(tab); setEmail(''); setPassword(''); setError(''); }}
+                                className={`flex-1 py-3 px-4 text-sm font-medium transition-all flex items-center justify-center gap-2 ${activeTab === tab
+                                        ? 'bg-white/10 text-white border-b-2 border-white'
+                                        : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+                                    }`}
+                            >
+                                <Icon size={16} />
+                                <span className="hidden sm:inline">{config.label.split(' ')[0]}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="p-8 space-y-6">
+                    {error && (
+                        <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                            <AlertCircle size={18} />
+                            {error}
+                        </div>
+                    )}
+
                     <div className="space-y-4">
-                        <button
-                            onClick={() => handleRoleLogin(UserRole.ADMIN)}
-                            className="w-full group bg-white hover:bg-blue-50 p-4 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-between"
-                        >
-                            <div className="flex items-center">
-                                <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center text-white mr-4 group-hover:bg-blue-600 transition-colors">
-                                    <Shield size={18} />
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-bold text-slate-800">Admin Portal</p>
-                                    <p className="text-xs text-slate-500">admin@cms.com</p>
-                                </div>
+                        <div>
+                            <label className="block text-white/70 text-sm mb-2">Email Address</label>
+                            <div className="relative">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Enter your email"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors"
+                                    required
+                                />
                             </div>
-                            <ArrowRight className="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" size={20} />
-                        </button>
+                        </div>
 
-                        <button
-                            onClick={() => handleRoleLogin(UserRole.STAFF)}
-                            className="w-full group bg-white hover:bg-blue-50 p-4 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-between"
-                        >
-                            <div className="flex items-center">
-                                <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white mr-4">
-                                    <Users size={18} />
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-bold text-slate-800">Staff Dashboard</p>
-                                    <p className="text-xs text-slate-500">sarah.staff@cms.com</p>
-                                </div>
+                        <div>
+                            <label className="block text-white/70 text-sm mb-2">Password</label>
+                            <div className="relative">
+                                <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter your password"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white/30 focus:outline-none focus:border-white/30 transition-colors"
+                                    required
+                                />
                             </div>
-                            <ArrowRight className="text-slate-300 group-hover:text-purple-600 group-hover:translate-x-1 transition-all" size={20} />
-                        </button>
+                        </div>
+                    </div>
 
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className={`w-full bg-gradient-to-r ${currentTab.gradient} text-white py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50`}
+                    >
+                        {isLoading ? (
+                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                            <>
+                                Sign In
+                                <ArrowRight size={18} />
+                            </>
+                        )}
+                    </button>
+
+                    {/* Demo credentials helper */}
+                    <div className="text-center">
                         <button
-                            onClick={() => handleRoleLogin(UserRole.STUDENT)}
-                            className="w-full group bg-white hover:bg-blue-50 p-4 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-between"
+                            type="button"
+                            onClick={fillCredentials}
+                            className="text-white/50 text-sm hover:text-white/80 transition-colors underline"
                         >
-                            <div className="flex items-center">
-                                <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white mr-4">
-                                    <UserIcon size={18} />
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-bold text-slate-800">Student / Victim Portal</p>
-                                    <p className="text-xs text-slate-500">student@university.edu</p>
-                                </div>
-                            </div>
-                            <ArrowRight className="text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" size={20} />
+                            Use demo credentials
                         </button>
                     </div>
-                    <p className="text-xs text-center text-white/40 mt-8">
-                        &copy; 2024 Enterprise CMS. All rights reserved.
+
+                    <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+                        <p className="text-white/40 text-xs mb-2">Demo Credentials:</p>
+                        <p className="text-white/60 text-xs font-mono">
+                            {credentials[activeTab].email}
+                        </p>
+                        <p className="text-white/40 text-xs font-mono">
+                            Password: {credentials[activeTab].password}
+                        </p>
+                    </div>
+                </form>
+
+                <div className="px-8 pb-6">
+                    <p className="text-xs text-center text-white/30">
+                        &copy; 2026 Enterprise CMS. All rights reserved.
                     </p>
                 </div>
             </div>

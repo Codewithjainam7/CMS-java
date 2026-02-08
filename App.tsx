@@ -29,7 +29,8 @@ const App = () => {
     const handleLogin = (user: User) => {
         setCurrentUser(user);
         setIsAuthenticated(true);
-        setCurrentPage('dashboard');
+        // Students go to my-complaints, others go to dashboard
+        setCurrentPage(user.role === UserRole.STUDENT ? 'my-complaints' : 'dashboard');
         // Ensure we start fresh
         setSelectedComplaintId(null);
     };
@@ -64,7 +65,7 @@ const App = () => {
     };
 
     const handleSubmitComplaint = (data: any) => {
-        const newId = `CMP-2024-${(complaints.length + 1).toString().padStart(5, '0')}`;
+        const newId = `CMP-2026-${(complaints.length + 1).toString().padStart(5, '0')}`;
         const newComplaint: Complaint = {
             id: newId,
             ...data,
