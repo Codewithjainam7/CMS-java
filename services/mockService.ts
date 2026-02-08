@@ -11,8 +11,8 @@ const generateUser = (id: string, role: UserRole, index: number): User => {
   return {
     id,
     name: `${fName} ${lName}`,
-    email: role === UserRole.STAFF 
-      ? `${fName.toLowerCase()}.staff@cms.com` 
+    email: role === UserRole.STAFF
+      ? `${fName.toLowerCase()}.staff@cms.com`
       : `${fName.toLowerCase()}@gmail.com`,
     role,
     avatar: `https://i.pravatar.cc/150?u=${id}`,
@@ -71,7 +71,7 @@ export const MOCK_COMPLAINTS: Complaint[] = Array.from({ length: 120 }).map((_, 
   const category = getRandomItem(categories);
   const desc = getRandomItem(descriptions);
   const sentiment = getSentimentForDesc(desc);
-  
+
   // Distribute statuses realistically
   let status = ComplaintStatus.NEW;
   const rand = Math.random();
@@ -82,9 +82,9 @@ export const MOCK_COMPLAINTS: Complaint[] = Array.from({ length: 120 }).map((_, 
 
   const customer = getRandomItem(MOCK_USERS.filter(u => u.role === UserRole.CUSTOMER));
   const staff = status !== ComplaintStatus.NEW ? getRandomItem(MOCK_USERS.filter(u => u.role === UserRole.STAFF)) : undefined;
-  
+
   const createdDate = new Date(now.getTime() - Math.random() * 30 * oneDay); // Last 30 days
-  
+
   // Calculate specific SLA
   let slaTime = 0;
   if (priority === Priority.CRITICAL) slaTime = 2 * oneHour;
@@ -97,7 +97,7 @@ export const MOCK_COMPLAINTS: Complaint[] = Array.from({ length: 120 }).map((_, 
   return {
     id: `CMP-2024-${(i + 1).toString().padStart(5, '0')}`,
     title: `${category} Issue - ${i + 1}`,
-    description: `${desc} (Ticket #${i+1})`,
+    description: `${desc} (Ticket #${i + 1})`,
     category,
     priority,
     status,
@@ -128,10 +128,20 @@ export const analyzeSentiment = (text: string): Sentiment => {
 
 export const suggestCategory = (text: string): string => {
   const lower = text.toLowerCase();
-  if (lower.includes('bill') || lower.includes('refund') || lower.includes('charge') || lower.includes('payment')) return 'Billing';
-  if (lower.includes('internet') || lower.includes('connect') || lower.includes('error') || lower.includes('bug') || lower.includes('load')) return 'Technical';
-  if (lower.includes('staff') || lower.includes('rude') || lower.includes('wait') || lower.includes('service')) return 'Service';
-  return 'General';
+
+  // Billing Issues
+  if (lower.includes('bill') || lower.includes('refund') || lower.includes('charge') || lower.includes('payment') || lower.includes('invoice') || lower.includes('cost') || lower.includes('subscription')) return 'Billing';
+
+  // Technical Issues
+  if (lower.includes('internet') || lower.includes('connect') || lower.includes('error') || lower.includes('bug') || lower.includes('load') || lower.includes('crash') || lower.includes('500') || lower.includes('slow') || lower.includes('login') || lower.includes('down')) return 'Technical';
+
+  // Service Issues
+  if (lower.includes('staff') || lower.includes('rude') || lower.includes('wait') || lower.includes('service') || lower.includes('response') || lower.includes('support') || lower.includes('agent') || lower.includes('harassment') || lower.includes('molest') || lower.includes('unsafe') || lower.includes('unprofessional')) return 'Service';
+
+  // Product Issues
+  if (lower.includes('product') || lower.includes('feature') || lower.includes('broken') || lower.includes('damage') || lower.includes('quality') || lower.includes('item') || lower.includes('missing') || lower.includes('design')) return 'Product';
+
+  return ''; // Default to empty string so user is forced to select if unsure, or 'General' but 'General' might not be in the dropdown
 };
 
 export const calculateSLA = (priority: Priority): string => {
