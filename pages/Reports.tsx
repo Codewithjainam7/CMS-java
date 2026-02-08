@@ -2,13 +2,13 @@
 import React, { useState } from 'react';
 import { Complaint, ComplaintStatus, UserRole, Priority } from '../types';
 import { MOCK_USERS } from '../services/mockService';
-import { 
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-    LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, Legend 
+import {
+    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    LineChart, Line, PieChart, Pie, Cell, AreaChart, Area, Legend
 } from 'recharts';
-import { 
-    Download, FileText, Filter, Calendar, TrendingUp, AlertTriangle, 
-    CheckCircle, Users, Clock, ArrowUpRight, ArrowDownRight, Printer 
+import {
+    Download, FileText, Filter, Calendar, TrendingUp, AlertTriangle,
+    CheckCircle, Users, Clock, ArrowUpRight, ArrowDownRight, Printer
 } from 'lucide-react';
 
 interface ReportsProps {
@@ -70,21 +70,25 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
     };
 
     // --- Styling Variables ---
-    const cardClass = isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200';
+    const cardClass = isDarkMode
+        ? 'bg-gradient-to-br from-slate-800/90 to-slate-900/90 border-slate-700/50 backdrop-blur-sm'
+        : 'bg-gradient-to-br from-white to-slate-50/50 border-slate-200/50 backdrop-blur-sm shadow-xl';
     const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
     const textSecondary = isDarkMode ? 'text-slate-400' : 'text-slate-500';
-    const gridColor = isDarkMode ? '#334155' : '#f1f5f9';
+    const gridColor = isDarkMode ? '#334155' : '#e2e8f0';
     const tooltipStyle = {
         backgroundColor: isDarkMode ? '#1e293b' : '#fff',
-        borderRadius: '12px',
-        border: isDarkMode ? '1px solid #334155' : 'none',
+        borderRadius: '16px',
+        border: isDarkMode ? '1px solid #334155' : '1px solid #e2e8f0',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
+        padding: '12px 16px',
         color: isDarkMode ? '#fff' : '#000'
     };
 
     const ExportButton = ({ icon: Icon, label, color, type }: any) => (
-        <button 
+        <button
             onClick={() => handleExport(type)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl font-bold transition-all shadow-sm hover:shadow-md active:scale-95 ${color}`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 ${color}`}
         >
             <Icon size={18} />
             <span>{label}</span>
@@ -92,53 +96,56 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
     );
 
     const StatCard = ({ label, value, subtext, trend }: any) => (
-        <div className={`p-6 rounded-2xl shadow-sm border ${cardClass}`}>
-            <p className={`text-sm font-medium mb-1 ${textSecondary}`}>{label}</p>
+        <div className={`relative overflow-hidden p-6 rounded-3xl shadow-xl border transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${cardClass}`}>
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-blue-500/5 rounded-full blur-2xl" />
+            <p className={`text-sm font-medium mb-2 ${textSecondary}`}>{label}</p>
             <div className="flex items-end justify-between">
-                <h3 className={`text-3xl font-bold ${textPrimary}`}>{value}</h3>
+                <h3 className={`text-3xl font-extrabold tracking-tight ${textPrimary}`}>{value}</h3>
                 {trend && (
-                    <span className={`flex items-center text-xs font-bold px-2 py-1 rounded-lg ${trend > 0 ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
-                        {trend > 0 ? <ArrowUpRight size={14} className="mr-1"/> : <ArrowDownRight size={14} className="mr-1"/>}
+                    <span className={`flex items-center text-xs font-bold px-3 py-1.5 rounded-xl backdrop-blur-sm ${trend > 0 ? 'bg-green-500/10 text-green-500 ring-1 ring-green-500/20' : 'bg-red-500/10 text-red-500 ring-1 ring-red-500/20'}`}>
+                        {trend > 0 ? <ArrowUpRight size={14} className="mr-1" /> : <ArrowDownRight size={14} className="mr-1" />}
                         {Math.abs(trend)}%
                     </span>
                 )}
             </div>
-            <p className={`text-xs mt-2 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{subtext}</p>
+            <p className={`text-xs mt-3 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{subtext}</p>
         </div>
     );
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Header */}
-            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-3xl shadow-sm border ${cardClass}`}>
+            <div className={`relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-3xl shadow-xl border ${cardClass}`}>
+                <div className="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl" />
+                <div className="absolute -left-10 -bottom-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl" />
                 <div>
                     <h1 className={`text-3xl font-extrabold tracking-tight ${textPrimary}`}>Analytics & Reports</h1>
                     <p className={`mt-2 text-lg ${textSecondary}`}>Comprehensive insights into system performance and compliance.</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                    <ExportButton 
-                        icon={Printer} 
-                        label="Print Report" 
-                        color={isDarkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-slate-100 text-slate-700 hover:bg-slate-200"} 
-                        type="Print" 
+                    <ExportButton
+                        icon={Printer}
+                        label="Print Report"
+                        color={isDarkMode ? "bg-slate-700 text-slate-200 hover:bg-slate-600" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}
+                        type="Print"
                     />
-                    <ExportButton 
-                        icon={FileText} 
-                        label="Export PDF" 
-                        color={isDarkMode ? "bg-blue-900/40 text-blue-300 hover:bg-blue-900/60" : "bg-blue-50 text-blue-700 hover:bg-blue-100"} 
-                        type="PDF" 
+                    <ExportButton
+                        icon={FileText}
+                        label="Export PDF"
+                        color={isDarkMode ? "bg-blue-900/40 text-blue-300 hover:bg-blue-900/60" : "bg-blue-50 text-blue-700 hover:bg-blue-100"}
+                        type="PDF"
                     />
-                    <ExportButton 
-                        icon={Download} 
-                        label="Export CSV" 
-                        color="bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20" 
-                        type="CSV" 
+                    <ExportButton
+                        icon={Download}
+                        label="Export CSV"
+                        color="bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-600/20"
+                        type="CSV"
                     />
                 </div>
             </div>
 
             {/* Filter Bar */}
-            <div className={`p-4 rounded-2xl shadow-sm border flex flex-wrap gap-4 items-center ${cardClass}`}>
+            <div className={`p-4 rounded-2xl shadow-lg border flex flex-wrap gap-4 items-center ${cardClass}`}>
                 <div className={`flex items-center gap-2 px-2 ${textSecondary}`}>
                     <Filter size={20} />
                     <span className="font-bold text-sm uppercase tracking-wider">Filters</span>
@@ -163,16 +170,15 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
             </div>
 
             {/* Tabs */}
-            <div className={`flex space-x-1 p-1.5 rounded-2xl w-fit ${isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-slate-200/50'}`}>
+            <div className={`flex space-x-1 p-1.5 rounded-2xl w-fit shadow-lg ${isDarkMode ? 'bg-slate-800/80 border border-slate-700/50 backdrop-blur-sm' : 'bg-white border border-slate-200/50'}`}>
                 {['overview', 'staff', 'sla'].map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab as any)}
-                        className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all capitalize ${
-                            activeTab === tab 
-                            ? (isDarkMode ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-blue-600 shadow-sm')
-                            : (isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-700' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50')
-                        }`}
+                        className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all capitalize ${activeTab === tab
+                                ? (isDarkMode ? 'bg-blue-600 text-white shadow-sm' : 'bg-white text-blue-600 shadow-sm')
+                                : (isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-700' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50')
+                            }`}
                     >
                         {tab === 'sla' ? 'SLA Compliance' : tab === 'staff' ? 'Staff Performance' : 'Overview'}
                     </button>
@@ -184,16 +190,16 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                 <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <StatCard label="Total Complaints" value={total} subtext="Total tickets received" trend={12.5} />
-                        <StatCard label="Resolved Rate" value={`${Math.round((resolved/total)*100)}%`} subtext="Complaints closed successfully" trend={5.2} />
+                        <StatCard label="Resolved Rate" value={`${Math.round((resolved / total) * 100)}%`} subtext="Complaints closed successfully" trend={5.2} />
                         <StatCard label="Avg Response Time" value="2.4h" subtext="Time to first response" trend={-1.4} />
                         <StatCard label="Customer Satisfaction" value="4.8/5" subtext="Average feedback rating" trend={0.8} />
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Status Distribution */}
-                        <div className={`p-6 rounded-3xl shadow-sm border ${cardClass}`}>
-                             <h3 className={`font-bold mb-6 ${textPrimary}`}>Status Distribution</h3>
-                             <div className="h-80">
+                        <div className={`relative overflow-hidden p-6 rounded-3xl shadow-xl border transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/5 before:to-transparent before:pointer-events-none ${cardClass}`}>
+                            <h3 className={`font-bold mb-6 ${textPrimary}`}>Status Distribution</h3>
+                            <div className="h-80">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
@@ -217,7 +223,7 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                                         </text>
                                     </PieChart>
                                 </ResponsiveContainer>
-                             </div>
+                            </div>
                         </div>
 
                         {/* Priority Breakdown */}
@@ -228,8 +234,8 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                                     <BarChart data={priorityData} layout="vertical">
                                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={gridColor} />
                                         <XAxis type="number" hide />
-                                        <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={80} tick={{fontWeight: 'bold', fill: isDarkMode ? '#94a3b8' : '#64748b'}} />
-                                        <Tooltip cursor={{fill: isDarkMode ? '#334155' : '#f8fafc'}} contentStyle={tooltipStyle} />
+                                        <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} width={80} tick={{ fontWeight: 'bold', fill: isDarkMode ? '#94a3b8' : '#64748b' }} />
+                                        <Tooltip cursor={{ fill: isDarkMode ? '#334155' : '#f8fafc' }} contentStyle={tooltipStyle} />
                                         <Bar dataKey="count" radius={[0, 6, 6, 0]} barSize={30}>
                                             {priorityData.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={PRIORITY_COLORS[index % PRIORITY_COLORS.length]} />
@@ -249,25 +255,25 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={categoryData}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
-                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: isDarkMode ? '#94a3b8' : '#64748b'}} />
-                                        <YAxis axisLine={false} tickLine={false} tick={{fill: isDarkMode ? '#94a3b8' : '#64748b'}} />
-                                        <Tooltip cursor={{fill: isDarkMode ? '#334155' : '#f8fafc'}} contentStyle={tooltipStyle} />
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b' }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b' }} />
+                                        <Tooltip cursor={{ fill: isDarkMode ? '#334155' : '#f8fafc' }} contentStyle={tooltipStyle} />
                                         <Bar dataKey="count" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={40} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
                         </div>
-                         
+
                         {/* Avg Resolution Time */}
                         <div className={`p-6 rounded-3xl shadow-sm border ${cardClass}`}>
-                             <h3 className={`font-bold mb-6 ${textPrimary}`}>Avg Resolution Time (Hours)</h3>
-                             <div className="h-64">
+                            <h3 className={`font-bold mb-6 ${textPrimary}`}>Avg Resolution Time (Hours)</h3>
+                            <div className="h-64">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={avgResolutionData}>
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
-                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: isDarkMode ? '#94a3b8' : '#64748b'}} />
-                                        <YAxis axisLine={false} tickLine={false} tick={{fill: isDarkMode ? '#94a3b8' : '#64748b'}} />
-                                        <Tooltip cursor={{fill: isDarkMode ? '#334155' : '#f8fafc'}} contentStyle={tooltipStyle} />
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b' }} />
+                                        <YAxis axisLine={false} tickLine={false} tick={{ fill: isDarkMode ? '#94a3b8' : '#64748b' }} />
+                                        <Tooltip cursor={{ fill: isDarkMode ? '#334155' : '#f8fafc' }} contentStyle={tooltipStyle} />
                                         <Bar dataKey="hours" fill="#8b5cf6" radius={[6, 6, 0, 0]} barSize={40} />
                                     </BarChart>
                                 </ResponsiveContainer>
@@ -302,7 +308,7 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center">
                                                 <span className={`font-mono mr-4 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>#{idx + 1}</span>
-                                                <img src={staff.avatar} className={`w-10 h-10 rounded-full border mr-3 ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`} alt=""/>
+                                                <img src={staff.avatar} className={`w-10 h-10 rounded-full border mr-3 ${isDarkMode ? 'border-slate-600' : 'border-slate-200'}`} alt="" />
                                                 <div>
                                                     <p className={`font-bold ${textPrimary}`}>{staff.name}</p>
                                                     <p className={`text-xs ${textSecondary}`}>{staff.email}</p>
@@ -338,9 +344,9 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                     <div className={`p-6 rounded-3xl shadow-sm border lg:col-span-1 ${cardClass}`}>
                         <h3 className={`font-bold mb-2 ${textPrimary}`}>Overall Compliance</h3>
                         <p className={`text-sm mb-6 ${textSecondary}`}>Percentage of tickets resolved within deadline</p>
-                        
+
                         <div className="relative h-64 flex items-center justify-center">
-                             <ResponsiveContainer width="100%" height="100%">
+                            <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie
                                         data={[
@@ -359,7 +365,7 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                                 </PieChart>
                             </ResponsiveContainer>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className={`text-4xl font-extrabold ${textPrimary}`}>{Math.round((slaMet/total)*100)}%</span>
+                                <span className={`text-4xl font-extrabold ${textPrimary}`}>{Math.round((slaMet / total) * 100)}%</span>
                                 <span className={`text-xs font-bold uppercase ${textSecondary}`}>Compliance</span>
                             </div>
                         </div>
