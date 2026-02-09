@@ -122,15 +122,15 @@ const Layout: React.FC<LayoutProps> = ({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden relative min-w-0 z-10">
-        {/* Glass Header */}
-        <header className={`h-24 glass-header flex items-center justify-between px-8 z-40 sticky top-0 w-full transition-all duration-300`}>
+      <main className="flex-1 flex flex-col h-screen overflow-hidden relative min-w-0 z-10 p-4 pt-0">
+        {/* Glass Header - iOS 26 Style */}
+        <header className={`h-20 mt-4 rounded-[24px] flex items-center justify-between px-8 z-40 transition-all duration-300 ${isDarkMode ? 'bg-slate-900/60 border border-white/10' : 'bg-white/90 border border-slate-200/50 shadow-lg'} backdrop-blur-xl`}>
           <div className="flex items-center">
             <h2 className={`text-3xl font-bold capitalize tracking-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               {currentPage.replace('-', ' ')}
             </h2>
-            {/* Search Bar - Glass */}
-            <div className={`ml-12 hidden md:flex items-center rounded-2xl px-5 py-3 w-72 border transition-all focus-within:ring-2 focus-within:ring-blue-500/50 ${isDarkMode ? 'glass input-glass border-white/10' : 'bg-slate-100/80 border-slate-200/50 hover:bg-slate-200/50'}`}>
+            {/* Search Bar - iOS 26 Style */}
+            <div className={`ml-8 hidden md:flex items-center rounded-[16px] px-5 py-2.5 w-64 border transition-all focus-within:ring-2 focus-within:ring-blue-500/50 ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-slate-100/80 border-slate-200/50 hover:bg-slate-200/50'}`}>
               <Search size={18} className={isDarkMode ? 'text-white/40 mr-3' : 'text-slate-400 mr-3'} />
               <input
                 type="text"
