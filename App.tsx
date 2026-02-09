@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Layout from './components/Layout';
+import SkeletonLoader from './components/SkeletonLoader';
 import Dashboard from './pages/Dashboard';
 import ComplaintList from './pages/ComplaintList';
 import ComplaintDetail from './pages/ComplaintDetail';
@@ -17,6 +18,7 @@ const App = () => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
 
     const [currentPage, setCurrentPage] = useState('dashboard');
+    const [isPageLoading, setIsPageLoading] = useState(false);
     const [complaints, setComplaints] = useState<Complaint[]>(MOCK_COMPLAINTS);
     const [selectedComplaintId, setSelectedComplaintId] = useState<string | null>(null);
     const [isDarkMode, setIsDarkMode] = useState(false);
@@ -25,6 +27,7 @@ const App = () => {
         { id: '1', message: 'New complaint "Internet Failure" registered.', read: false, time: '2 mins ago', type: 'info' },
         { id: '2', message: 'SLA Breach imminent for Ticket #204.', read: false, time: '1 hour ago', type: 'alert' }
     ]);
+
 
     const handleLogin = (user: User) => {
         setCurrentUser(user);
@@ -56,8 +59,15 @@ const App = () => {
     };
 
     const handleNavigate = (page: string) => {
-        setCurrentPage(page);
-        setSelectedComplaintId(null);
+        if (page !== currentPage) {
+            setIsPageLoading(true);
+            setSelectedComplaintId(null);
+            // Smooth transition with skeleton
+            setTimeout(() => {
+                setCurrentPage(page);
+                setIsPageLoading(false);
+            }, 400);
+        }
     };
 
     const handleSelectComplaint = (id: string) => {
@@ -109,6 +119,14 @@ const App = () => {
     }
 
     const renderContent = () => {
+        // Show skeleton during page transitions
+        if (isPageLoading) {
+            const skeletonType = currentPage === 'dashboard' ? 'dashboard'
+                : (currentPage === 'complaints' || currentPage === 'my-complaints') ? 'list'
+                    : 'default';
+            return <SkeletonLoader isDarkMode={isDarkMode} type={skeletonType} />;
+        }
+
         if (selectedComplaintId) {
             const complaint = complaints.find(c => c.id === selectedComplaintId);
             if (complaint) return (
