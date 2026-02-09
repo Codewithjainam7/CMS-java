@@ -177,7 +177,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     placeholder="Full Name"
-                                    className="input-glass w-full rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/30 outline-none text-[15px] font-medium"
+                                    className="w-full rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/30 outline-none text-[15px] font-medium bg-white/5 border border-white/10 focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 transition-all"
                                     required
                                 />
                             </div>
@@ -192,7 +192,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder={activeTab === 'student' ? "University Email" : "Enterprise ID"}
-                            className="input-glass w-full rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/30 outline-none text-[15px] font-medium"
+                            className="w-full rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/30 outline-none text-[15px] font-medium bg-white/5 border border-white/10 focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 transition-all"
                             required
                         />
                     </div>
@@ -205,7 +205,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="Password"
-                            className="input-glass w-full rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/30 outline-none text-[15px] font-medium"
+                            className="w-full rounded-2xl py-4 pl-12 pr-4 text-white placeholder-white/30 outline-none text-[15px] font-medium bg-white/5 border border-white/10 focus:bg-white/10 focus:border-white/30 focus:ring-2 focus:ring-white/10 transition-all"
                             required
                         />
                     </div>
