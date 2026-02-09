@@ -233,16 +233,33 @@ const ComplaintDetail: React.FC<ComplaintDetailProps> = ({ complaint, currentUse
                             Resolution Timeline
                         </h3>
 
-                        <div className="relative pt-2 pb-6 px-4">
-                            {/* Connecting Line */}
-                            <div className="absolute top-[1.5rem] left-[10%] right-[10%] h-1 bg-white/10 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(59,130,246,0.5)]"
-                                    style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
-                                ></div>
+                        <div className="relative pt-2 pb-8 px-4">
+                            {/* 12-Segment Progress Bar */}
+                            <div className="absolute top-[1.5rem] left-[5%] right-[5%] flex gap-1.5">
+                                {Array.from({ length: 12 }).map((_, idx) => {
+                                    const filledSegments = Math.floor((currentStepIndex / (steps.length - 1)) * 12);
+                                    const isFilled = idx < filledSegments;
+                                    const isPartial = idx === filledSegments && currentStepIndex < steps.length - 1;
+
+                                    return (
+                                        <div
+                                            key={idx}
+                                            className={`flex-1 h-2 rounded-full transition-all duration-500 ease-out ${isFilled
+                                                    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]'
+                                                    : isPartial
+                                                        ? 'bg-gradient-to-r from-blue-500/50 to-transparent'
+                                                        : 'bg-white/10'
+                                                }`}
+                                            style={{
+                                                animationDelay: `${idx * 50}ms`,
+                                                transform: isFilled ? 'scaleY(1.2)' : 'scaleY(1)'
+                                            }}
+                                        />
+                                    );
+                                })}
                             </div>
 
-                            <div className="relative flex justify-between w-full">
+                            <div className="relative flex justify-between w-full mt-8 pt-4">
                                 {steps.map((step, idx) => {
                                     const isCompleted = idx <= currentStepIndex;
                                     const isCurrent = idx === currentStepIndex;
@@ -250,23 +267,24 @@ const ComplaintDetail: React.FC<ComplaintDetailProps> = ({ complaint, currentUse
                                     return (
                                         <div key={step} className="flex flex-col items-center group relative z-10 w-1/4">
                                             <div className={`
-                                            w-12 h-12 rounded-full flex items-center justify-center border-[4px] transition-all duration-500 transform
-                                            ${isCompleted
-                                                    ? 'bg-blue-600 border-slate-900 text-white shadow-lg shadow-blue-500/50 scale-110'
-                                                    : 'bg-slate-800 border-slate-900 text-slate-600'
+                                                w-14 h-14 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 transform
+                                                ${isCompleted
+                                                    ? 'bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400/50 text-white shadow-xl shadow-blue-500/40 scale-100'
+                                                    : 'bg-slate-800/80 border-slate-700 text-slate-500 scale-90'
                                                 }
-                                        `}>
-                                                {isCompleted ? <CheckCircle size={20} strokeWidth={3} /> : <div className="w-2.5 h-2.5 bg-slate-600 rounded-full" />}
+                                                ${isCurrent ? 'ring-4 ring-blue-500/20 scale-110' : ''}
+                                            `}>
+                                                {isCompleted ? <CheckCircle size={24} strokeWidth={2.5} /> : <div className="w-3 h-3 bg-slate-600 rounded-full" />}
                                             </div>
                                             <span className={`
-                                            absolute -bottom-10 text-[10px] md:text-xs font-bold whitespace-nowrap transition-all duration-300 uppercase tracking-wider px-3 py-1 rounded-full
-                                            ${isCurrent
-                                                    ? 'text-blue-400 bg-blue-500/10 translate-y-0 opacity-100'
+                                                absolute -bottom-8 text-[10px] md:text-xs font-bold whitespace-nowrap transition-all duration-300 uppercase tracking-wider px-3 py-1.5 rounded-xl
+                                                ${isCurrent
+                                                    ? 'text-blue-400 bg-blue-500/20 border border-blue-500/20 translate-y-0 opacity-100'
                                                     : isCompleted
                                                         ? 'text-slate-300'
-                                                        : 'text-slate-600 opacity-50'
+                                                        : 'text-slate-600 opacity-40'
                                                 }
-                                        `}>
+                                            `}>
                                                 {step.replace('_', ' ')}
                                             </span>
                                         </div>

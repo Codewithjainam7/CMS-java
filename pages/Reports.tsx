@@ -8,7 +8,7 @@ import {
 } from 'recharts';
 import {
     Download, FileText, Filter, Calendar, TrendingUp, AlertTriangle,
-    CheckCircle, Users, Clock, ArrowUpRight, ArrowDownRight, Printer
+    CheckCircle, Users, Clock, ArrowUpRight, ArrowDownRight, Printer, ChevronDown
 } from 'lucide-react';
 
 interface ReportsProps {
@@ -18,6 +18,10 @@ interface ReportsProps {
 
 const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
     const [activeTab, setActiveTab] = useState<'overview' | 'staff' | 'sla'>('overview');
+    const [timeFilter, setTimeFilter] = useState('This Month');
+    const [staffFilter, setStaffFilter] = useState('All Staff');
+    const [showTimeDropdown, setShowTimeDropdown] = useState(false);
+    const [showStaffDropdown, setShowStaffDropdown] = useState(false);
 
     // --- Data Calculation Logic ---
     const total = complaints.length;
@@ -145,49 +149,93 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
             </div>
 
             {/* Filter Bar */}
-            <div className={`p-4 rounded-3xl shadow-lg border flex flex-wrap gap-4 items-center bg-black/20 border-white/10 backdrop-blur-md`}>
+            <div className={`p-4 rounded-3xl shadow-lg border flex flex-wrap gap-4 items-center bg-black/30 border-white/10 backdrop-blur-xl`}>
                 <div className={`flex items-center gap-2 px-4 ${textSecondary}`}>
                     <Filter size={20} />
                     <span className="font-bold text-xs uppercase tracking-wider">Filters</span>
                 </div>
                 <div className="h-8 w-px mx-2 bg-white/10"></div>
-                <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                    <Calendar size={16} className="text-blue-400" />
-                    <select className="bg-transparent text-sm focus:outline-none font-bold text-white cursor-pointer [&>option]:bg-slate-900 [&>option]:text-slate-200">
-                        <option>This Month</option>
-                        <option>Last Quarter</option>
-                        <option>Year to Date</option>
-                    </select>
+
+                {/* Time Filter Dropdown */}
+                <div className="relative">
+                    <button
+                        onClick={() => { setShowTimeDropdown(!showTimeDropdown); setShowStaffDropdown(false); }}
+                        className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer group"
+                    >
+                        <Calendar size={16} className="text-blue-400" />
+                        <span className="text-sm font-bold text-white">{timeFilter}</span>
+                        <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${showTimeDropdown ? 'rotate-180' : ''}`} />
+                    </button>
+                    {showTimeDropdown && (
+                        <div className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-slate-900/95 border border-white/10 backdrop-blur-xl shadow-2xl shadow-black/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                            {['This Month', 'Last Quarter', 'Year to Date', 'Last 7 Days', 'Custom Range'].map((option) => (
+                                <button
+                                    key={option}
+                                    onClick={() => { setTimeFilter(option); setShowTimeDropdown(false); }}
+                                    className={`w-full px-4 py-3 text-left text-sm font-medium transition-all hover:bg-white/10 flex items-center gap-3 ${timeFilter === option ? 'text-blue-400 bg-blue-500/10' : 'text-white'}`}
+                                >
+                                    {timeFilter === option && <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>}
+                                    <span className={timeFilter === option ? '' : 'ml-4'}>{option}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
-                <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
-                    <Users size={16} className="text-purple-400" />
-                    <select className="bg-transparent text-sm focus:outline-none font-bold text-white cursor-pointer [&>option]:bg-slate-900 [&>option]:text-slate-200">
-                        <option>All Staff</option>
-                        <option>Technical Team</option>
-                        <option>Billing Team</option>
-                    </select>
+
+                {/* Staff Filter Dropdown */}
+                <div className="relative">
+                    <button
+                        onClick={() => { setShowStaffDropdown(!showStaffDropdown); setShowTimeDropdown(false); }}
+                        className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer group"
+                    >
+                        <Users size={16} className="text-purple-400" />
+                        <span className="text-sm font-bold text-white">{staffFilter}</span>
+                        <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${showStaffDropdown ? 'rotate-180' : ''}`} />
+                    </button>
+                    {showStaffDropdown && (
+                        <div className="absolute top-full left-0 mt-2 w-48 rounded-2xl bg-slate-900/95 border border-white/10 backdrop-blur-xl shadow-2xl shadow-black/50 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                            {['All Staff', 'Technical Team', 'Billing Team', 'Customer Support', 'Management'].map((option) => (
+                                <button
+                                    key={option}
+                                    onClick={() => { setStaffFilter(option); setShowStaffDropdown(false); }}
+                                    className={`w-full px-4 py-3 text-left text-sm font-medium transition-all hover:bg-white/10 flex items-center gap-3 ${staffFilter === option ? 'text-purple-400 bg-purple-500/10' : 'text-white'}`}
+                                >
+                                    {staffFilter === option && <div className="w-1.5 h-1.5 rounded-full bg-purple-400"></div>}
+                                    <span className={staffFilter === option ? '' : 'ml-4'}>{option}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex space-x-1 p-1.5 rounded-2xl w-fit bg-black/20 border border-white/10 backdrop-blur-md">
-                {['overview', 'staff', 'sla'].map((tab) => (
+            {/* Tabs with Smooth Animation */}
+            <div className="relative flex p-1.5 rounded-2xl w-fit bg-black/30 border border-white/10 backdrop-blur-xl">
+                {/* Sliding Background Indicator */}
+                <div
+                    className="absolute top-1.5 h-[calc(100%-12px)] bg-blue-600 rounded-xl shadow-lg shadow-blue-500/30 transition-all duration-500 ease-out"
+                    style={{
+                        left: activeTab === 'overview' ? '6px' : activeTab === 'staff' ? 'calc(33.33% + 2px)' : 'calc(66.66% - 2px)',
+                        width: activeTab === 'overview' ? '105px' : activeTab === 'staff' ? '165px' : '145px'
+                    }}
+                />
+                {[{ key: 'overview', label: 'Overview' }, { key: 'staff', label: 'Staff Performance' }, { key: 'sla', label: 'SLA Compliance' }].map((tab) => (
                     <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab as any)}
-                        className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all ${activeTab === tab
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
-                            : 'text-slate-400 hover:text-white hover:bg-white/5'
+                        key={tab.key}
+                        onClick={() => setActiveTab(tab.key as any)}
+                        className={`relative z-10 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 ${activeTab === tab.key
+                            ? 'text-white'
+                            : 'text-slate-400 hover:text-white'
                             }`}
                     >
-                        {tab === 'sla' ? 'SLA Compliance' : tab === 'staff' ? 'Staff Performance' : 'Overview'}
+                        {tab.label}
                     </button>
                 ))}
             </div>
 
-            {/* Tab Content */}
+            {/* Tab Content with Animation */}
             {activeTab === 'overview' && (
-                <div className="space-y-6">
+                <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <StatCard label="Total Complaints" value={total} subtext="Total tickets received" trend={12.5} />
                         <StatCard label="Resolved Rate" value={`${Math.round((resolved / total) * 100)}%`} subtext="Complaints closed successfully" trend={5.2} />
@@ -284,7 +332,7 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
             )}
 
             {activeTab === 'staff' && (
-                <div className={`rounded-[32px] shadow-2xl overflow-hidden ${cardClass}`}>
+                <div className={`rounded-[32px] shadow-2xl overflow-hidden ${cardClass} animate-in fade-in slide-in-from-right-4 duration-500`}>
                     <div className="p-8 border-b border-white/10 flex justify-between items-center bg-white/5">
                         <h3 className={`font-bold text-xl ${textPrimary}`}>Staff Performance Leaderboard</h3>
                         <button className="text-blue-400 text-sm font-bold hover:text-blue-300 transition-colors">View All Staff</button>
@@ -343,7 +391,7 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
             )}
 
             {activeTab === 'sla' && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
                     <div className={`p-8 rounded-[32px] shadow-2xl lg:col-span-1 ${cardClass}`}>
                         <h3 className={`font-bold mb-2 text-xl ${textPrimary}`}>Overall Compliance</h3>
                         <p className={`text-sm mb-8 font-medium ${textSecondary}`}>Percentage of tickets resolved within deadline</p>
