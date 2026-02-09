@@ -149,21 +149,21 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
             </div>
 
             {/* Filter Bar */}
-            <div className={`p-4 rounded-3xl shadow-lg border flex flex-wrap gap-4 items-center bg-black/30 border-white/10 backdrop-blur-xl`}>
-                <div className={`flex items-center gap-2 px-4 ${textSecondary}`}>
+            <div className={`relative z-30 p-4 rounded-3xl shadow-lg border flex flex-wrap gap-4 items-center bg-slate-50/90 dark:bg-black/30 border-slate-200/50 dark:border-white/10 backdrop-blur-xl`}>
+                <div className={`flex items-center gap-2 px-4 text-slate-600 dark:text-slate-400`}>
                     <Filter size={20} />
                     <span className="font-bold text-xs uppercase tracking-wider">Filters</span>
                 </div>
-                <div className="h-8 w-px mx-2 bg-white/10"></div>
+                <div className="h-8 w-px mx-2 bg-slate-300 dark:bg-white/10"></div>
 
                 {/* Time Filter Dropdown */}
-                <div className="relative">
+                <div className="relative z-50">
                     <button
                         onClick={() => { setShowTimeDropdown(!showTimeDropdown); setShowStaffDropdown(false); }}
-                        className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer group"
+                        className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200/50 dark:border-white/10 hover:bg-slate-200/80 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all cursor-pointer group"
                     >
                         <Calendar size={16} className="text-blue-400" />
-                        <span className="text-sm font-bold text-white">{timeFilter}</span>
+                        <span className="text-sm font-bold text-slate-800 dark:text-white">{timeFilter}</span>
                         <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${showTimeDropdown ? 'rotate-180' : ''}`} />
                     </button>
                     {showTimeDropdown && (
@@ -183,13 +183,13 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                 </div>
 
                 {/* Staff Filter Dropdown */}
-                <div className="relative">
+                <div className="relative z-50">
                     <button
                         onClick={() => { setShowStaffDropdown(!showStaffDropdown); setShowTimeDropdown(false); }}
-                        className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer group"
+                        className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-slate-100/80 dark:bg-white/5 border border-slate-200/50 dark:border-white/10 hover:bg-slate-200/80 dark:hover:bg-white/10 hover:border-slate-300 dark:hover:border-white/20 transition-all cursor-pointer group"
                     >
                         <Users size={16} className="text-purple-400" />
-                        <span className="text-sm font-bold text-white">{staffFilter}</span>
+                        <span className="text-sm font-bold text-slate-800 dark:text-white">{staffFilter}</span>
                         <ChevronDown size={14} className={`text-slate-400 transition-transform duration-300 ${showStaffDropdown ? 'rotate-180' : ''}`} />
                     </button>
                     {showStaffDropdown && (
@@ -210,12 +210,13 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
             </div>
 
             {/* Tabs with Smooth Animation */}
-            <div className="relative flex p-1.5 rounded-2xl w-fit bg-black/30 border border-white/10 backdrop-blur-xl">
-                {/* Sliding Background Indicator */}
+            <div className="relative flex p-1.5 rounded-2xl w-fit bg-slate-100/90 dark:bg-black/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-xl">
+                {/* Sliding Background Indicator - GPU Accelerated */}
                 <div
-                    className="absolute top-1.5 h-[calc(100%-12px)] bg-blue-600 rounded-xl shadow-lg shadow-blue-500/30 transition-all duration-500 ease-out"
+                    className="absolute top-1.5 h-[calc(100%-12px)] bg-blue-600 rounded-xl shadow-lg shadow-blue-500/30 will-change-transform"
                     style={{
-                        left: activeTab === 'overview' ? '6px' : activeTab === 'staff' ? 'calc(33.33% + 2px)' : 'calc(66.66% - 2px)',
+                        transform: `translateX(${activeTab === 'overview' ? '0' : activeTab === 'staff' ? '105px' : '270px'})`,
+                        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                         width: activeTab === 'overview' ? '105px' : activeTab === 'staff' ? '165px' : '145px'
                     }}
                 />
@@ -356,9 +357,9 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                                         <td className="px-8 py-5">
                                             <div className="flex items-center">
                                                 <span className="font-mono mr-4 text-slate-500 font-bold">#{idx + 1}</span>
-                                                <div className="relative">
-                                                    <img src={staff.avatar} className="w-10 h-10 rounded-full border border-white/10 mr-4" alt="" />
-                                                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0f172a]"></div>
+                                                <div className="relative mr-4">
+                                                    <img src={staff.avatar} className="w-10 h-10 rounded-full border-2 border-slate-200 dark:border-white/10" alt="" />
+                                                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 shadow-lg shadow-emerald-500/50"></div>
                                                 </div>
                                                 <div>
                                                     <p className={`font-bold ${textPrimary}`}>{staff.name}</p>
