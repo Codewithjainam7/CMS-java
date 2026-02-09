@@ -63,16 +63,16 @@ const Layout: React.FC<LayoutProps> = ({
 
       {/* Sidebar */}
       <aside
-        className={`${isSidebarOpen ? 'w-72' : 'w-24'} glass-sidebar text-white flex flex-col transition-all duration-300 z-50 flex-shrink-0 relative`}
+        className={`${isSidebarOpen ? 'w-72' : 'w-24'} glass-sidebar flex flex-col transition-all duration-300 z-50 flex-shrink-0 relative ${isDarkMode ? 'text-white' : 'text-slate-800'}`}
       >
-        <div className="p-6 flex items-center justify-between h-24 border-b border-white/5">
+        <div className={`p-6 flex items-center justify-between h-24 border-b ${isDarkMode ? 'border-white/5' : 'border-slate-200/50'}`}>
           <div className="flex items-center space-x-3 overflow-hidden cursor-pointer" onClick={() => onNavigate('dashboard')}>
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0 transition-all duration-300 ${isSidebarOpen ? 'bg-blue-600 shadow-blue-600/30' : 'bg-transparent border border-white/20'}`}>
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0 transition-all duration-300 ${isSidebarOpen ? 'bg-blue-600 shadow-blue-600/30' : `bg-transparent border ${isDarkMode ? 'border-white/20' : 'border-slate-300'}`}`}>
               E
             </div>
             {isSidebarOpen && <span className="text-xl font-bold tracking-tight whitespace-nowrap animate-in fade-in duration-200 drop-shadow-sm">Enterprise</span>}
           </div>
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-white/50 hover:text-white transition-colors p-2 rounded-xl hover:bg-white/10">
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-xl transition-colors ${isDarkMode ? 'text-white/50 hover:text-white hover:bg-white/10' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}>
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -84,10 +84,12 @@ const Layout: React.FC<LayoutProps> = ({
               onClick={() => onNavigate(item.id)}
               className={`flex items-center space-x-3 w-full p-4 rounded-2xl transition-all duration-200 group relative ${currentPage === item.id
                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40'
-                : 'text-white/60 hover:bg-white/10 hover:text-white'
+                : isDarkMode
+                  ? 'text-white/60 hover:bg-white/10 hover:text-white'
+                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 } ${!isSidebarOpen && 'justify-center'}`}
             >
-              <item.icon size={22} className={currentPage === item.id ? 'text-white' : 'text-white/60 group-hover:text-white'} />
+              <item.icon size={22} className={currentPage === item.id ? 'text-white' : isDarkMode ? 'text-white/60 group-hover:text-white' : 'text-slate-500 group-hover:text-slate-900'} />
               {isSidebarOpen && <span className="font-medium text-[15px] animate-in fade-in duration-200">{item.label}</span>}
               {!isSidebarOpen && currentPage === item.id && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-8 rounded-r-full bg-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
@@ -96,22 +98,22 @@ const Layout: React.FC<LayoutProps> = ({
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/5 bg-black/20 backdrop-blur-sm">
+        <div className={`p-4 border-t ${isDarkMode ? 'border-white/5 bg-black/20' : 'border-slate-200/50 bg-slate-50/50'} backdrop-blur-sm`}>
           <div
-            className={`flex items-center space-x-3 mb-4 p-3 rounded-2xl bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition ${!isSidebarOpen && 'justify-center'}`}
+            className={`flex items-center space-x-3 mb-4 p-3 rounded-2xl border cursor-pointer transition ${isDarkMode ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-white/80 border-slate-200/50 hover:bg-slate-100'} ${!isSidebarOpen && 'justify-center'}`}
             onClick={() => onNavigate('profile')}
           >
-            <img src={user.avatar} alt="User" className="w-10 h-10 rounded-full border border-white/20 object-cover" />
+            <img src={user.avatar} alt="User" className={`w-10 h-10 rounded-full border object-cover ${isDarkMode ? 'border-white/20' : 'border-slate-200'}`} />
             {isSidebarOpen && (
               <div className="overflow-hidden">
-                <p className="text-sm font-semibold truncate text-white">{user.name}</p>
+                <p className={`text-sm font-semibold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{user.name}</p>
                 <p className="text-xs text-blue-400 uppercase font-bold tracking-wider">{user.role}</p>
               </div>
             )}
           </div>
           <button
             onClick={handleLogoutClick}
-            className={`flex items-center space-x-2 text-white/40 hover:text-red-400 w-full p-3 transition-colors rounded-xl hover:bg-red-400/10 ${!isSidebarOpen && 'justify-center'}`}
+            className={`flex items-center space-x-2 w-full p-3 transition-colors rounded-xl ${isDarkMode ? 'text-white/40 hover:text-red-400 hover:bg-red-400/10' : 'text-slate-500 hover:text-red-600 hover:bg-red-50'} ${!isSidebarOpen && 'justify-center'}`}
           >
             <LogOut size={20} />
             {isSidebarOpen && <span className="font-medium text-sm">Sign Out</span>}
@@ -128,12 +130,12 @@ const Layout: React.FC<LayoutProps> = ({
               {currentPage.replace('-', ' ')}
             </h2>
             {/* Search Bar - Glass */}
-            <div className="ml-12 hidden md:flex items-center rounded-2xl px-5 py-3 w-72 border transition-all glass input-glass border-white/10 focus-within:ring-2 focus-within:ring-blue-500/50">
-              <Search size={18} className="text-white/40 mr-3" />
+            <div className={`ml-12 hidden md:flex items-center rounded-2xl px-5 py-3 w-72 border transition-all focus-within:ring-2 focus-within:ring-blue-500/50 ${isDarkMode ? 'glass input-glass border-white/10' : 'bg-slate-100/80 border-slate-200/50 hover:bg-slate-200/50'}`}>
+              <Search size={18} className={isDarkMode ? 'text-white/40 mr-3' : 'text-slate-400 mr-3'} />
               <input
                 type="text"
                 placeholder="Quick search..."
-                className="bg-transparent border-none focus:outline-none text-sm w-full placeholder-white/30 text-white"
+                className={`bg-transparent border-none focus:outline-none text-sm w-full ${isDarkMode ? 'placeholder-white/30 text-white' : 'placeholder-slate-400 text-slate-900'}`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -152,11 +154,11 @@ const Layout: React.FC<LayoutProps> = ({
             <div className="relative">
               <button
                 onClick={() => { setShowNotifications(!showNotifications); setShowSettings(false); }}
-                className={`relative p-3 rounded-full transition-all duration-300 ${showNotifications ? 'bg-blue-500/20 text-blue-400' : 'text-white/60 hover:bg-white/10 hover:text-white'}`}
+                className={`relative p-3 rounded-full transition-all duration-300 ${showNotifications ? 'bg-blue-500/20 text-blue-400' : isDarkMode ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
               >
                 <Bell size={24} />
                 {unreadCount > 0 && (
-                  <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-black animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)]"></span>
+                  <span className={`absolute top-2 right-2 w-2.5 h-2.5 bg-red-500 rounded-full border-2 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)] ${isDarkMode ? 'border-black' : 'border-white'}`}></span>
                 )}
               </button>
 
@@ -202,7 +204,7 @@ const Layout: React.FC<LayoutProps> = ({
             <div className="relative">
               <button
                 onClick={() => { setShowSettings(!showSettings); setShowNotifications(false); }}
-                className={`p-3 rounded-full transition-all duration-300 ${showSettings ? 'bg-blue-500/20 text-blue-400' : 'text-white/60 hover:bg-white/10 hover:text-white'}`}
+                className={`p-3 rounded-full transition-all duration-300 ${showSettings ? 'bg-blue-500/20 text-blue-400' : isDarkMode ? 'text-white/60 hover:bg-white/10 hover:text-white' : 'text-slate-500 hover:bg-slate-100 hover:text-slate-900'}`}
               >
                 <Settings size={24} />
               </button>
