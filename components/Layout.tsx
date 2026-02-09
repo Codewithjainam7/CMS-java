@@ -61,18 +61,18 @@ const Layout: React.FC<LayoutProps> = ({
         <div className={`absolute top-[40%] left-[30%] w-[40vw] h-[40vw] rounded-full blur-[80px] animate-bounce mix-blend-screen transition-opacity duration-700 ${isDarkMode ? 'bg-emerald-500/10' : 'bg-emerald-400/20'}`} style={{ animationDuration: '20s' }} />
       </div>
 
-      {/* Sidebar */}
+      {/* Sidebar - iOS 26 Style */}
       <aside
-        className={`${isSidebarOpen ? 'w-72' : 'w-24'} glass-sidebar flex flex-col transition-all duration-300 z-50 flex-shrink-0 relative ${isDarkMode ? 'text-white' : 'text-slate-800'}`}
+        className={`${isSidebarOpen ? 'w-72' : 'w-24'} m-4 rounded-[32px] flex flex-col transition-all duration-300 z-50 flex-shrink-0 relative overflow-hidden ${isDarkMode ? 'bg-slate-900/60 text-white border border-white/10' : 'bg-white/90 text-slate-800 border border-slate-200/50 shadow-xl'} backdrop-blur-xl`}
       >
         <div className={`p-6 flex items-center justify-between h-24 border-b ${isDarkMode ? 'border-white/5' : 'border-slate-200/50'}`}>
           <div className="flex items-center space-x-3 overflow-hidden cursor-pointer" onClick={() => onNavigate('dashboard')}>
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0 transition-all duration-300 ${isSidebarOpen ? 'bg-blue-600 shadow-blue-600/30' : `bg-transparent border ${isDarkMode ? 'border-white/20' : 'border-slate-300'}`}`}>
+            <div className={`w-12 h-12 rounded-[16px] flex items-center justify-center text-white font-bold text-xl shadow-lg shrink-0 transition-all duration-300 ${isSidebarOpen ? 'bg-blue-600 shadow-blue-600/30' : `bg-transparent border ${isDarkMode ? 'border-white/20' : 'border-slate-300'}`}`}>
               E
             </div>
             {isSidebarOpen && <span className="text-xl font-bold tracking-tight whitespace-nowrap animate-in fade-in duration-200 drop-shadow-sm">Enterprise</span>}
           </div>
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2 rounded-xl transition-colors ${isDarkMode ? 'text-white/50 hover:text-white hover:bg-white/10' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}>
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className={`p-2.5 rounded-[12px] transition-colors ${isDarkMode ? 'text-white/50 hover:text-white hover:bg-white/10' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'}`}>
             {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
@@ -82,8 +82,8 @@ const Layout: React.FC<LayoutProps> = ({
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`flex items-center space-x-3 w-full p-4 rounded-2xl transition-all duration-200 group relative ${currentPage === item.id
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/40'
+              className={`flex items-center space-x-3 w-full p-4 rounded-[20px] transition-all duration-300 group relative ${currentPage === item.id
+                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/40'
                 : isDarkMode
                   ? 'text-white/60 hover:bg-white/10 hover:text-white'
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'

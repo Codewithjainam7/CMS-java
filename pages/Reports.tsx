@@ -209,24 +209,15 @@ const Reports: React.FC<ReportsProps> = ({ complaints, isDarkMode }) => {
                 </div>
             </div>
 
-            {/* Tabs with Smooth Animation */}
-            <div className="relative flex p-1.5 rounded-2xl w-fit bg-slate-100/90 dark:bg-black/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-xl">
-                {/* Sliding Background Indicator - GPU Accelerated */}
-                <div
-                    className="absolute top-1.5 h-[calc(100%-12px)] bg-blue-600 rounded-xl shadow-lg shadow-blue-500/30 will-change-transform"
-                    style={{
-                        transform: `translateX(${activeTab === 'overview' ? '0' : activeTab === 'staff' ? '105px' : '270px'})`,
-                        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                        width: activeTab === 'overview' ? '105px' : activeTab === 'staff' ? '165px' : '145px'
-                    }}
-                />
+            {/* Tabs - iOS 26 Style */}
+            <div className="flex gap-2 p-2 rounded-[24px] w-fit bg-slate-100/90 dark:bg-black/30 border border-slate-200/50 dark:border-white/10 backdrop-blur-xl">
                 {[{ key: 'overview', label: 'Overview' }, { key: 'staff', label: 'Staff Performance' }, { key: 'sla', label: 'SLA Compliance' }].map((tab) => (
                     <button
                         key={tab.key}
                         onClick={() => setActiveTab(tab.key as any)}
-                        className={`relative z-10 px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 ${activeTab === tab.key
-                            ? 'text-white'
-                            : 'text-slate-400 hover:text-white'
+                        className={`relative px-6 py-3 rounded-[16px] text-xs font-black uppercase tracking-wider transition-all duration-300 ${activeTab === tab.key
+                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/5'
                             }`}
                     >
                         {tab.label}
